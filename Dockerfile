@@ -4,20 +4,19 @@ FROM golang:1.21 AS backend-builder
 # Install runtime dependencies (libvips)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libvips-dev && \
-    libvips=8.8.4 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the environment variables for the build
 ENV GOOS=linux
-ENV GOARCH=arm64
+ENV GOARCH=amd64
 
 # Copy the source code and build the backend
 WORKDIR /app
 COPY go.* ./
 RUN go mod download
 COPY . .
-RUN go build -ldflags "-s -w" -o discuit .
+RUN go build -o discuit .
 
 # Use official Node image for the frontend build
 FROM node:18 AS frontend-builder
@@ -44,7 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     mariadb-server \
     redis-server \
     libvips-dev && \
-    libvips=8.8.4 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

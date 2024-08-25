@@ -5,7 +5,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8090:80"
     environment:
       DISCUIT_ADDR: ":80"
       DISCUIT_SITE_NAME: "Discuit"
@@ -26,7 +26,7 @@ services:
       - redis
 
   db:
-    image: mariadb:10.11.5
+    image: mariadb
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -39,7 +39,7 @@ services:
       - "3306:3306"
 
   redis:
-    image: redis:7.2.3-alpine
+    image: redis:alpine
     restart: unless-stopped
     volumes:
       - discuit-redis:/data

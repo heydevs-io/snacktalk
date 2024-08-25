@@ -95,6 +95,21 @@ func serve(ctx *cli.Context) error {
 	server := &http.Server{
 		Addr: conf.Addr,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Add CORS headers
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8090")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Csrf-Token")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+			// Add Access-Control-Expose-Headers
+			w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token, Set-Cookie, csrf-token, Csrf-Token")
+
+			// Handle preflight requests
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
 			// If the domain name contains www. redirect to one without.
 			host := r.Host
 			if strings.HasPrefix(host, "www.") {

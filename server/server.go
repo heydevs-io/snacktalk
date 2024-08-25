@@ -193,7 +193,7 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	s.staticRouter.PathPrefix("/images/").Handler(&images.Server{
 		SkipHashCheck: conf.IsDevelopment,
 		DB:            db,
-		EnableCORS:    true,
+		EnableCORS:    false,
 	})
 
 	if conf.UIProxy != "" {
@@ -348,9 +348,11 @@ func (s *Server) setCsrfCookie(ses *sessions.Session, w http.ResponseWriter, r *
 	if setCookie {
 		token := utils.NewHMAC(ses.ID, s.config.HMACSecret)
 		http.SetCookie(w, &http.Cookie{
-			Name:  "csrftoken",
-			Value: token,
-			Path:  "/",
+			Name:     "csrftoken",
+			Value:    token,
+			Path:     "/",
+			Secure:   true,
+			HttpOnly: true,
 		})
 		w.Header().Add("Csrf-Token", token)
 	}
@@ -358,6 +360,7 @@ func (s *Server) setCsrfCookie(ses *sessions.Session, w http.ResponseWriter, r *
 
 func (s *Server) setInitialCookies(w http.ResponseWriter, r *http.Request, ses *sessions.Session) {
 	if !ses.CookieSet {
+		fmt.Println("ses.CookieSet", ses.CookieSet)
 		ses.Save(w, r)
 	}
 	s.setCsrfCookie(ses, w, r)
