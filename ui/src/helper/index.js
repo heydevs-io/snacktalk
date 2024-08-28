@@ -317,8 +317,11 @@ function getCsrfCookieToken() {
 }
 
 export function mfetch(url, options = {}) {
-  return fetch(url, {
+  return fetch('http://localhost:8090' + url.slice(0), {
+    // return fetch('https://dev.snacktalk.screentor.com' + url.slice(0), {
+    // return fetch(url, {
     ...options,
+    credentials: 'include',
     headers: {
       ...options.headers,
       'X-Csrf-Token': getCsrfCookieToken(),

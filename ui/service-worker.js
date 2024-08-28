@@ -79,7 +79,11 @@ const shouldCache = (request) => {
   return false;
 };
 
-const cacheFirst = async ({ request, preloadResponsePromise }) => {
+const cacheFirst = async ({ request: oldRequest, preloadResponsePromise }) => {
+  const url = oldRequest?.url.includes('localhost:8080/images') ? oldRequest.url : undefined;
+  const newURL = url && url.replace('localhost:8080/images', 'localhost:8090/images');
+  const request = newURL ? new Request(newURL, { ...oldRequest, url: newURL }) : oldRequest;
+
   const cachedRes = await caches.match(request);
   if (cachedRes) {
     return cachedRes;
@@ -98,6 +102,7 @@ const cacheFirst = async ({ request, preloadResponsePromise }) => {
 
   try {
     const networkRes = await fetch(request);
+
     if (shouldCache(request)) {
       putInCache(request, networkRes.clone());
     }

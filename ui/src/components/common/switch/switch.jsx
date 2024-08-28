@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './switch.module.scss';
+import styles from './switch.module.css';
 
 const Switch = ({ leftLabel = 'Off', rightLabel = 'On', checked, onChange }) => {
   return (
