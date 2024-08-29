@@ -82,7 +82,7 @@ func Parse(path string) (*Config, error) {
 		Addr:               ":8080",
 		DBUser:             "discuit",
 		SessionCookieName:  "SID",
-		RedisAddress:       ":6379",
+		RedisAddress:       ":6381",
 		PaginationLimit:    10,
 		PaginationLimitMax: 50,
 		DefaultFeedSort:    core.FeedSortHot,

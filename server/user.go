@@ -3,6 +3,7 @@ package server
 import (
 	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"io"
 	"math/big"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"github.com/discuitnet/discuit/internal/httperr"
 	"github.com/discuitnet/discuit/internal/httputil"
 	"github.com/discuitnet/discuit/internal/uid"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 )
 
@@ -234,6 +236,140 @@ func (s *Server) login(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
+func (s *Server) requestOTP(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	email := values["email"]
+
+	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return httperr.NewBadRequest("user_not_found", "User not found")
+	}
+
+	if email == "" {
+		return httperr.NewBadRequest("missing_email", "Missing email")
+	}
+
+	// Generate OTP
+	otp, err := generateOTP(4)
+	if err != nil {
+		return httperr.NewBadRequest("otp_generate_fail", err.Error())
+	}
+
+	// Generate session ID
+	sessionId := uid.New()
+
+	// Define OTP TTL (e.g., 5 minutes)
+	otpTTL := 5 * time.Minute
+
+	// Save OTP in Redis
+	conn := s.redisPool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + email + ":" + sessionId.String()
+
+	// Set the OTP code with expiration
+	_, err = conn.Do("SETEX", key, int(otpTTL.Seconds()), otp)
+	if err != nil {
+		return httperr.NewBadRequest("otp_save_fail", err.Error())
+	}
+
+	// Prepare response data
+	responseData := map[string]interface{}{
+		"otp":       otp,
+		"sessionId": sessionId,
+	}
+
+	// Write JSON response
+	if err := w.writeJSON(responseData); err != nil {
+		return httperr.NewBadRequest("response_write_fail", err.Error())
+	}
+
+	return nil
+}
+
+func (s *Server) verifyOTP(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	email := values["email"]
+	otp := values["otp"]
+	sessionId := values["sessionId"]
+
+	if otp == "" || sessionId == "" {
+		return httperr.NewBadRequest("missing_data", "Missing data")
+	}
+
+	conn := s.redisPool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + email + ":" + sessionId
+
+	// Retrieve the OTP code from Redis
+	storedOTP, err := redis.String(conn.Do("GET", key))
+	if err == redis.ErrNil {
+		// OTP does not exist or has expired
+		return httperr.NewBadRequest("invalid_or_expired_otp", "Invalid or expired OTP")
+	}
+	if err != nil {
+		return httperr.NewBadRequest("otp_retrieve_fail", err.Error())
+	}
+
+	// Compare stored OTP with provided OTP
+	if storedOTP != otp {
+		return httperr.NewBadRequest("invalid_otp", "Invalid OTP")
+	}
+
+	// OTP is valid, proceed with your login or next step
+	// TODO: login function
+	// get user info
+	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
+
+	if err != nil {
+		return httperr.NewBadRequest("user_not_found", "User not found")
+	}
+
+	// Try logging in user.
+	s.loginUser(user, r.ses, w, r.req)
+
+	// Delete OTP key from Redis
+	_, err = conn.Do("DEL", key)
+	if err != nil {
+		return httperr.NewBadRequest("otp_delete_fail", err.Error())
+	}
+
+	// Prepare success response
+	responseData := map[string]interface{}{
+		"message": "OTP verified successfully",
+	}
+
+	// Write JSON response
+	if err := w.writeJSON(responseData); err != nil {
+		return httperr.NewBadRequest("response_write_fail", err.Error())
+	}
+
+	return nil
+}
+
 // /api/_signup [POST]
 func (s *Server) signup(w *responseWriter, r *request) error {
 	if r.loggedIn {
@@ -348,6 +484,30 @@ func (s *Server) getLoggedInUser(w *responseWriter, r *request) error {
 	}
 
 	return w.writeJSON(user)
+}
+
+func (s *Server) logout(w *responseWriter, r *request) error {
+	// Check if the user is logged in
+	if !r.loggedIn {
+		return httperr.NewBadRequest("not_logged_in", "User is not logged in.")
+	}
+
+	// Get the current user
+	user, err := core.GetUser(r.ctx, s.db, *r.viewer, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Perform the logout operation
+	if err = s.logoutUser(user, r.ses, w, r.req); err != nil {
+		return err
+	}
+
+	// Respond with a success message
+	responseData := map[string]interface{}{
+		"message": "Successfully logged out.",
+	}
+	return w.writeJSON(responseData)
 }
 
 // /api/notifications [POST]
@@ -696,4 +856,17 @@ func randChar(charset string) (string, error) {
 		return "", err
 	}
 	return string(charset[randomIndex.Int64()]), nil
+}
+
+// generateOTP generates a 6-digit OTP.
+func generateOTP(otpLength int) (string, error) {
+	otp := ""
+	for i := 0; i < otpLength; i++ {
+		digit, err := rand.Int(rand.Reader, big.NewInt(10))
+		if err != nil {
+			return "", fmt.Errorf("Fail to generate OTP")
+		}
+		otp += digit.String()
+	}
+	return otp, nil
 }

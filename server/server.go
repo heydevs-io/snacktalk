@@ -103,9 +103,12 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 
 	// API routes.
 	r.Handle("/api/_initial", s.withHandler(s.initial)).Methods("GET")
+	r.Handle("/api/_request_otp", s.withHandler(s.requestOTP)).Methods("POST")
+	r.Handle("/api/_verify_otp", s.withHandler(s.verifyOTP)).Methods("POST")
 	r.Handle("/api/_login", s.withHandler(s.login)).Methods("POST")
 	r.Handle("/api/_signup", s.withHandler(s.signup)).Methods("POST")
 	r.Handle("/api/_signup_v2", s.withHandler(s.signupVer2)).Methods("POST")
+	r.Handle("/api/_logout", s.withHandler(s.logout)).Methods("POST")
 	r.Handle("/api/_user", s.withHandler(s.getLoggedInUser)).Methods("GET")
 
 	r.Handle("/api/users/{username}", s.withHandler(s.getUser)).Methods("GET")
