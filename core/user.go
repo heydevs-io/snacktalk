@@ -414,7 +414,7 @@ func scanUsers(ctx context.Context, db *sql.DB, rows *sql.Rows, viewer *uid.ID) 
 }
 
 // RegisterUser creates a new user.
-func RegisterUser(ctx context.Context, db *sql.DB, username, email, password string) (*User, error) {
+func RegisterUser(ctx context.Context, db *sql.DB, username, email, password string, phoneCode string, phoneNumber string) (*User, error) {
 	// Check for duplicates.
 	if exists, _, err := usernameExists(ctx, db, username); err != nil {
 		return nil, err
@@ -431,17 +431,34 @@ func RegisterUser(ctx context.Context, db *sql.DB, username, email, password str
 		return nil, httperr.NewBadRequest("invalid-username", fmt.Sprintf("Username %v.", err))
 	}
 
+	// Validate phoneCode and phoneNumber relationship
+	if (phoneCode != "" && phoneNumber == "") || (phoneCode == "" && phoneNumber != "") {
+		return nil, httperr.NewBadRequest("invalid-phone", "If phoneCode is provided, phoneNumber must also be provided, and vice versa.")
+	}
+
 	hash, err := HashPassword([]byte(password))
 	if err != nil {
 		return nil, err
 	}
 
-	// Note: Thet email address is not checked to be a valid email address. Any
+	// Note: The email address is not checked to be a valid email address. Any
 	// string can be stored as an email address currently.
 	nullEmail := msql.NullString{}
 	if email != "" {
 		nullEmail.Valid = true
 		nullEmail.String = email
+	}
+
+	nullPhoneCode := msql.NullString{}
+	if phoneCode != "" {
+		nullPhoneCode.Valid = true
+		nullPhoneCode.String = phoneCode
+	}
+
+	nullPhoneNumber := msql.NullString{}
+	if phoneNumber != "" {
+		nullPhoneNumber.Valid = true
+		nullPhoneNumber.String = phoneNumber
 	}
 
 	id := uid.New()
@@ -451,6 +468,8 @@ func RegisterUser(ctx context.Context, db *sql.DB, username, email, password str
 		{Name: "username_lc", Value: strings.ToLower(username)},
 		{Name: "email", Value: nullEmail},
 		{Name: "password", Value: hash},
+		{Name: "phone_code", Value: nullPhoneCode},
+		{Name: "phone_number", Value: nullPhoneNumber},
 	})
 	_, err = db.ExecContext(ctx, query, args...)
 	if err != nil {
@@ -1236,7 +1255,7 @@ func CreateGhostUser(db *sql.DB) (bool, error) {
 	if err := db.QueryRow("SELECT username_lc FROM users WHERE username_lc = ?", "ghost").Scan(&username); err != nil {
 		if err == sql.ErrNoRows {
 			// Ghost user not found; create one.
-			_, createErr := RegisterUser(context.Background(), db, "ghost", "", utils.GenerateStringID(48))
+			_, createErr := RegisterUser(context.Background(), db, "ghost", "", utils.GenerateStringID(48), "", "")
 			return createErr == nil, createErr
 		}
 		return false, err

@@ -248,6 +248,8 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 	username := values["username"]
 	email := values["email"]
 	password := values["password"]
+	phoneCode := values["phoneCode"]
+	phoneNumber := values["phoneNumber"]
 	captchaToken := values["captchaToken"]
 
 	// Verify captcha.
@@ -267,7 +269,7 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 		return err
 	}
 
-	user, err := core.RegisterUser(r.ctx, s.db, username, email, password)
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber)
 	if err != nil {
 		return err
 	}
@@ -293,9 +295,9 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 
 	username := values["username"]
 	email := values["email"]
+	phoneCode := values["phoneCode"]
+	phoneNumber := values["phoneNumber"]
 	password := randomPassword(9)
-
-	// TODO: check email have domain in
 
 	// Extraxt the domain from the email
 	parts := strings.Split(email, "@")
@@ -318,7 +320,7 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 		return err
 	}
 
-	user, err := core.RegisterUser(r.ctx, s.db, username, email, password)
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber)
 	if err != nil {
 		return err
 	}
