@@ -4,7 +4,7 @@ services:
   discuit:
     build:
       context: .
-      dockerfile: docker/Dockerfile.amd64
+      dockerfile: docker/Dockerfile.arm64
     restart: unless-stopped
     ports:
       - "8090:80"

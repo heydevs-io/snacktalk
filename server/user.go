@@ -1,8 +1,10 @@
 package server
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"io"
+	"math/big"
 	"net/http"
 	"strconv"
 	"strings"
@@ -251,10 +253,61 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 	// Verify captcha.
 	if s.config.CaptchaSecret != "" {
 		if ok, err := hcaptcha.VerifyReCaptcha(s.config.CaptchaSecret, captchaToken); err != nil {
-			return httperr.NewForbidden("captcha_verify_fail_1", "Captha verification failed.")
+			return httperr.NewForbidden("captcha_verify_fail_1", "Captcha verification failed.")
 		} else if !ok {
-			return httperr.NewForbidden("captcha_verify_fail_2", "Captha verification failed.")
+			return httperr.NewForbidden("captcha_verify_fail_2", "Captcha verification failed.")
 		}
+	}
+
+	ip := httputil.GetIP(r.req)
+	if err := s.rateLimit(r, "signup_1_"+ip, time.Minute, 2); err != nil {
+		return err
+	}
+	if err := s.rateLimit(r, "signup_2_"+ip, time.Hour*6, 10); err != nil {
+		return err
+	}
+
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password)
+	if err != nil {
+		return err
+	}
+
+	// Try logging in user.
+	s.loginUser(user, r.ses, w, r.req)
+
+	w.WriteHeader(http.StatusCreated)
+	return w.writeJSON(user)
+}
+
+// /api/_signup_ver2 [POST]
+// sign up without password, use OTP to login
+func (s *Server) signupVer2(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	username := values["username"]
+	email := values["email"]
+	password := randomPassword(9)
+
+	// TODO: check email have domain in
+
+	// Extraxt the domain from the email
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return httperr.NewBadRequest("invalid_email", "Invalid email format")
+	}
+
+	domain := parts[1]
+
+	// Check if the domain or any of its parent domains is blacklisted
+	if err := core.CheckBlackDomain(r.ctx, s.db, domain); err != nil {
+		return httperr.NewForbidden("invalid_domain", err.Error())
 	}
 
 	ip := httputil.GetIP(r.req)
@@ -610,4 +663,35 @@ func (s *Server) addBadge(w *responseWriter, r *request) error {
 	}
 
 	return w.writeJSON(user.Badges)
+}
+
+const (
+	lowerChars = "abcdefghijklmnopqrstuvwxyz"
+	upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	digits     = "0123456789"
+	specials   = "!@#$%&*_"
+)
+
+func randomPassword(length int) string {
+	allChars := lowerChars + upperChars + digits + specials
+	password := make([]string, length)
+
+	for i := 0; i < length; i++ {
+		char, err := randChar(allChars)
+		if err != nil {
+			return "R@ndom123"
+		}
+		password[i] = char
+	}
+
+	return strings.Join(password, "")
+}
+
+func randChar(charset string) (string, error) {
+	max := big.NewInt(int64(len(charset)))
+	randomIndex, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return "", err
+	}
+	return string(charset[randomIndex.Int64()]), nil
 }

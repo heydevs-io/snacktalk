@@ -105,6 +105,7 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	r.Handle("/api/_initial", s.withHandler(s.initial)).Methods("GET")
 	r.Handle("/api/_login", s.withHandler(s.login)).Methods("POST")
 	r.Handle("/api/_signup", s.withHandler(s.signup)).Methods("POST")
+	r.Handle("/api/_signup_v2", s.withHandler(s.signupVer2)).Methods("POST")
 	r.Handle("/api/_user", s.withHandler(s.getLoggedInUser)).Methods("GET")
 
 	r.Handle("/api/users/{username}", s.withHandler(s.getUser)).Methods("GET")
@@ -185,6 +186,10 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	r.Handle("/api/_link_info", s.withHandler(s.getLinkInfo)).Methods("GET")
 
 	r.Handle("/api/analytics", s.withHandler(s.handleAnalytics)).Methods("POST")
+
+	r.Handle("/api/_blacklists", s.withHandler(s.getBlackListDomains)).Methods("GET")
+	r.Handle("/api/_blacklists/one", s.withHandler(s.createBlackDomain)).Methods("POST")
+	r.Handle("/api/_blacklists", s.withHandler(s.createBlackDomains)).Methods("POST")
 
 	r.NotFoundHandler = http.HandlerFunc(s.apiNotFoundHandler)
 	r.MethodNotAllowedHandler = http.HandlerFunc(s.apiMethodNotAllowedHandler)
