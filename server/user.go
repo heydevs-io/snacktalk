@@ -1,10 +1,12 @@
 package server
 
 import (
+	"context"
 	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -248,6 +250,9 @@ func (s *Server) requestOTP(w *responseWriter, r *request) error {
 
 	email := values["email"]
 
+	// check email domain
+	s.checkEmailDomain(r.ctx, email)
+
 	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
 	if err != nil {
 		return err
@@ -270,9 +275,6 @@ func (s *Server) requestOTP(w *responseWriter, r *request) error {
 	// Generate session ID
 	sessionId := uid.New()
 
-	// Define OTP TTL (e.g., 5 minutes)
-	otpTTL := 5 * time.Minute
-
 	// Save OTP in Redis
 	conn := s.redisPool.Get()
 	defer conn.Close()
@@ -281,14 +283,24 @@ func (s *Server) requestOTP(w *responseWriter, r *request) error {
 	key := "otp:" + email + ":" + sessionId.String()
 
 	// Set the OTP code with expiration
-	_, err = conn.Do("SETEX", key, int(otpTTL.Seconds()), otp)
+	_, err = conn.Do("SETEX", key, s.config.OtpTTL, otp)
 	if err != nil {
 		return httperr.NewBadRequest("otp_save_fail", err.Error())
 	}
 
+	// Run OTP sending in a separate goroutine
+	go func(user *core.User, otp string) {
+		// Detach from the request context
+		backgroundCtx := context.Background()
+
+		// Log the error if sending fails, but don't block the main process
+		if err := core.HandleSendOtp(backgroundCtx, user, otp); err != nil {
+			log.Printf("Failed to send OTP: %v", err)
+		}
+	}(user, otp)
+
 	// Prepare response data
 	responseData := map[string]interface{}{
-		"otp":       otp,
 		"sessionId": sessionId,
 	}
 
@@ -340,7 +352,6 @@ func (s *Server) verifyOTP(w *responseWriter, r *request) error {
 	}
 
 	// OTP is valid, proceed with your login or next step
-	// TODO: login function
 	// get user info
 	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
 
@@ -435,17 +446,9 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 	phoneNumber := values["phoneNumber"]
 	password := randomPassword(9)
 
-	// Extraxt the domain from the email
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 {
-		return httperr.NewBadRequest("invalid_email", "Invalid email format")
-	}
-
-	domain := parts[1]
-
-	// Check if the domain or any of its parent domains is blacklisted
-	if err := core.CheckBlackDomain(r.ctx, s.db, domain); err != nil {
-		return httperr.NewForbidden("invalid_domain", err.Error())
+	err = s.checkEmailDomain(r.ctx, email)
+	if err != nil {
+		return err
 	}
 
 	ip := httputil.GetIP(r.req)
@@ -461,11 +464,34 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 		return err
 	}
 
+	// Identify the user in Novu
+	err = core.IdentifyUser(r.ctx, user)
+	if err != nil {
+		return err
+	}
+
 	// Try logging in user.
-	s.loginUser(user, r.ses, w, r.req)
+	// s.loginUser(user, r.ses, w, r.req)
 
 	w.WriteHeader(http.StatusCreated)
 	return w.writeJSON(user)
+}
+
+func (s *Server) checkEmailDomain(ctx context.Context, email string) error {
+	// Extraxt the domain from the email
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return httperr.NewBadRequest("invalid_email", "Invalid email format")
+	}
+
+	domain := parts[1]
+
+	// Check if the domain or any of its parent domains is blacklisted
+	if err := core.CheckBlackDomain(ctx, s.db, domain); err != nil {
+		return httperr.NewForbidden("invalid_domain", err.Error())
+	}
+
+	return nil
 }
 
 // /api/_user [GET]

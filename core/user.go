@@ -100,8 +100,9 @@ type User struct {
 	Username          string `json:"username"`
 	UsernameLowerCase string `json:"-"`
 
-	EmailPublic *string `json:"email"`
-
+	EmailPublic      *string         `json:"email"`
+	PhoneCode        string          `json:"phoneCode"`
+	PhoneNumber      string          `json:"phoneNumber"`
 	Email            msql.NullString `json:"-"`
 	EmailConfirmedAt msql.NullTime   `json:"emailConfirmedAt"`
 	Password         string          `json:"-"`
@@ -235,6 +236,8 @@ func buildSelectUserQuery(where string) string {
 		"users.remember_feed_sort",
 		"users.embeds_off",
 		"users.hide_user_profile_pictures",
+		"users.phone_code",
+		"users.phone_number",
 	}
 	cols = append(cols, images.ImageColumns("pro_pic")...)
 	joins := []string{
@@ -334,6 +337,8 @@ func scanUsers(ctx context.Context, db *sql.DB, rows *sql.Rows, viewer *uid.ID) 
 			&u.RememberFeedSort,
 			&u.EmbedsOff,
 			&u.HideUserProfilePictures,
+			&u.PhoneCode,
+			&u.PhoneNumber,
 		}
 
 		proPic := &images.Image{}

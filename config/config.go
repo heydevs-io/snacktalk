@@ -73,6 +73,9 @@ type Config struct {
 	DiscordURL     string `yaml:"discordURL"`
 	GithubURL      string `yaml:"githubURL"`
 	SubstackURL    string `yaml:"substackURL"`
+
+	// redis otp ttl
+	OtpTTL int `yaml:"otpTTL"`
 }
 
 // Parse parses the yaml file at path and returns a Config.
