@@ -142,7 +142,7 @@ ButtonSearch.propTypes = {
 export const ButtonNotifications = ({ count = 0, ...props }) => {
   return (
     <button className="notifications-button button-icon-simple" {...props}>
-      {count > 0 && <div className="notifications-count">{count}</div>}
+      {count === 0 && <div className="notifications-count">{count}</div>}
       <svg
         width="24"
         height="24"

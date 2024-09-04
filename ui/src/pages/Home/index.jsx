@@ -59,8 +59,9 @@ const Home = () => {
       <main className="posts">
         {showInstallPrompt && (
           <div className="banner-install is-m">
-            {/*<ButtonClose className="banner-button-close" />*/}
-            <div className="banner-install-text">Get the app for a better experience.</div>
+            <div className="banner-install-text">
+              <p>Get the app for a better experience.</p>
+            </div>
             <ButtonAppInstall className="banner-install-button" deferredPrompt={deferredPrompt}>
               Install
             </ButtonAppInstall>
@@ -92,13 +93,7 @@ const Home = () => {
         </div>
       </div>*/}
       <aside className="sidebar-right is-custom-scrollbar is-v2'">
-        {!loggedIn && (
-          <div className="card card-sub card-padding">
-            <LoginForm />
-          </div>
-        )}
         <WelcomeBanner />
-        <MiniFooter />
       </aside>
     </div>
   );
@@ -134,8 +129,8 @@ export const ButtonAppInstall = ({ deferredPrompt, children, ...props }) => {
             <div className="modal-ios-install-steps">
               <ol>
                 <li>1. Tap on the Safari share button.</li>
-                <li>2. Tap on "Add to Home Screen."</li>
-                <li>3. Tap on "Add."</li>
+                <li>2. Tap on &quot;Add to Home Screen.&quot;</li>
+                <li>3. Tap on &quot;Add.&quot;</li>
               </ol>
               <p>Note that web apps on iOS can only be installed using Safari.</p>
             </div>

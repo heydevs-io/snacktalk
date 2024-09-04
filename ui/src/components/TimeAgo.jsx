@@ -27,7 +27,7 @@ const TimeAgo = ({ time, inline = true, prefix = '', suffix = ' ago', short = fa
       }),
       ...rest,
     },
-    `${prefix}${timeAgo(t, suffix, true, short)}`
+    `• ${prefix}${timeAgo(t, suffix, true, short)}`
   );
 };
 

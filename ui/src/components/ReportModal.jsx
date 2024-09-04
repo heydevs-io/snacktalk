@@ -63,7 +63,7 @@ const ReportModal = ({
     <>
       {noButton ? null : (
         <button className={buttonClassName} onClick={() => setInnerOpen(true)} disabled={disabled}>
-          Report
+          Báo cáo
         </button>
       )}
       <Modal open={open} onClose={handleClose}>

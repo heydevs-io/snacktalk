@@ -53,9 +53,9 @@ const User = () => {
   const queryParams = new URLSearchParams(location.search);
   const feedFilter = formatFilterText(queryParams.get('filter') ?? '');
   const selectBarOptions = [
-    { text: 'Overview', id: 'overview', queryParam: '' },
-    { text: 'Posts', id: 'posts', queryParam: 'posts' },
-    { text: 'Comments', id: 'comments', queryParam: 'comments' },
+    { text: 'Tổng quan', id: 'overview', queryParam: '' },
+    { text: 'Bài đăng', id: 'posts', queryParam: 'posts' },
+    { text: 'Bình luận', id: 'comments', queryParam: 'comments' },
   ];
   for (let i = 0; i < selectBarOptions.length; i++) {
     const param = selectBarOptions[i].queryParam;
@@ -251,7 +251,7 @@ const User = () => {
     return (
       <div className="card card-sub page-user-summary">
         <div className="card-head">
-          <div className="card-title">Summary</div>
+          <div className="card-title">Tóm tắt</div>
         </div>
         <div className="card-content">
           <div className="card-list-item user-summary-item">

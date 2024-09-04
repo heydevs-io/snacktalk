@@ -108,7 +108,7 @@ const cacheFirst = async ({ request: oldRequest, preloadResponsePromise }) => {
     }
     return networkRes;
   } catch (error) {
-    if (request.method === 'GET' && request.headers.get('accept').includes('text/html')) {
+    if (oldRequest.method === 'GET' && oldRequest.headers.get('accept').includes('text/html')) {
       const cache = await caches.open(CACHE_VERSION);
       const fallbackRes = await cache.match('/');
       if (fallbackRes) return fallbackRes;

@@ -22,13 +22,13 @@ import WelcomeBanner from '../views/WelcomeBanner';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const sortOptions = [
-  { text: 'Hot', id: 'hot' },
-  { text: 'Activity', id: 'activity' },
-  { text: 'New', id: 'latest' },
-  { text: 'Day', id: 'day' },
-  { text: 'Week', id: 'week' },
-  { text: 'Month', id: 'month' },
-  { text: 'Year', id: 'year' },
+  { text: 'Tin nóng', id: 'hot' },
+  { text: 'Hoạt động', id: 'activity' },
+  { text: 'Mới nhất', id: 'latest' },
+  { text: 'Ngày', id: 'day' },
+  { text: 'Tuần', id: 'week' },
+  { text: 'Tháng', id: 'month' },
+  { text: 'Năm', id: 'year' },
   // { text: 'All', id: 'all' },
 ];
 const sortDefault = CONFIG.defaultFeedSort;

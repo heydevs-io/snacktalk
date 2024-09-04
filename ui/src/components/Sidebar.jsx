@@ -15,6 +15,8 @@ import Search from './Navbar/Search';
 import { FlowIcon } from './svg/icons/flow';
 import { GroupIcon } from './svg/icons/group';
 import { HomeIcon } from './svg/icons/home';
+import CREATE_POST_STYLE from '../assets/imgs/create-post-style.svg';
+import PlusIcon from '../components/svg/icons/plus-icon.jsx';
 import clsx from 'clsx';
 
 const Sidebar = ({ isMobile = false }) => {
@@ -71,7 +73,9 @@ const Sidebar = ({ isMobile = false }) => {
               className="sidebar-item with-image"
               onClick={handleClose}
             >
-              <CommunityProPic name={c.name} proPic={c.proPic} className="is-image is-no-hover" />
+              <div className="sidebar-item-icon">
+                <CommunityProPic name={c.name} proPic={c.proPic} className="is-image is-no-hover" />
+              </div>
               <span>{c.name}</span>
             </Link>
           ))}
@@ -154,52 +158,79 @@ const Sidebar = ({ isMobile = false }) => {
             </div>
           )}
 
-          <MenuLink to={homePageLink('/')}>
-            <HomeIcon />
-            <span>Home</span>
-          </MenuLink>
-          {loggedIn && (
-            <MenuLink to={homePageLink(`/${homeFeed === 'all' ? 'subscriptions' : 'all'}`)}>
-              <GroupIcon />
-              <span>{homeFeed === 'all' ? 'Subscriptions' : 'All'}</span>
-            </MenuLink>
-          )}
-          <MenuLink to="/communities">
-            <GroupIcon />
-            <span>Communities</span>
-          </MenuLink>
+          <div className="sidebar-box-highlight">
+            {loggedIn && (
+              <Link to="/new" className="button button-main sidebar-button-create-desktop">
+                <img
+                  src={CREATE_POST_STYLE}
+                  alt="Create post"
+                  className="sidebar-button-create-image"
+                />
+                <PlusIcon />
+              </Link>
+            )}
 
-          <MenuLink to="/guidelines">
-            <FlowIcon />
-            <span>Guidelines</span>
-          </MenuLink>
+            <div className="sidebar-box-highlight-list">
+              <MenuLink to={homePageLink('/')}>
+                <div className="sidebar-item-icon">
+                  <HomeIcon />
+                </div>
+                <span>Trang chủ</span>
+              </MenuLink>
+              {loggedIn && (
+                <MenuLink to={homePageLink(`/${homeFeed === 'all' ? 'subscriptions' : 'all'}`)}>
+                  <div className="sidebar-item-icon">
+                    <GroupIcon />
+                  </div>
+                  <span>{homeFeed === 'all' ? 'Đã đăng ký' : 'Tất cả'}</span>
+                </MenuLink>
+              )}
+              <MenuLink to="/communities">
+                <div className="sidebar-item-icon">
+                  <GroupIcon />
+                </div>
+                <span>Cộng đồng</span>
+              </MenuLink>
+
+              <MenuLink to="/guidelines">
+                <div className="sidebar-item-icon">
+                  <FlowIcon />
+                </div>
+                <span>Hướng dẫn</span>
+              </MenuLink>
+            </div>
+          </div>
 
           <Link to="/terms" className="is-m">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 0 24 24"
-              width="24px"
-              fill="currentColor"
-            >
-              <path d="M0 0h24v24H0V0z" fill="none" />
-              <path d="M14.59 2.59c-.38-.38-.89-.59-1.42-.59H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8.83c0-.53-.21-1.04-.59-1.41l-4.82-4.83zM15 18H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm-2-6V3.5L18.5 9H14c-.55 0-1-.45-1-1z" />
-            </svg>
-            <span>Terms</span>
+            <div className="sidebar-item-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="currentColor"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14.59 2.59c-.38-.38-.89-.59-1.42-.59H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8.83c0-.53-.21-1.04-.59-1.41l-4.82-4.83zM15 18H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm-2-6V3.5L18.5 9H14c-.55 0-1-.45-1-1z" />
+              </svg>
+            </div>
+            <span>Điều khoản</span>
           </Link>
 
           <MenuLink to="/privacy-policy" className="is-m">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 0 24 24"
-              width="24px"
-              fill="currentColor"
-            >
-              <path d="M0 0h24v24H0V0z" fill="none" />
-              <path d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V18c0 .55.45 1 1 1h9c.55 0 1-.45 1-1v-1.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V18c0 .55.45 1 1 1h6v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z" />
-            </svg>
-            <span>Privacy</span>
+            <div className="sidebar-item-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="currentColor"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V18c0 .55.45 1 1 1h9c.55 0 1-.45 1-1v-1.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V18c0 .55.45 1 1 1h6v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z" />
+              </svg>
+            </div>
+            <span>Chính sách</span>
           </MenuLink>
 
           <MenuLink to={`mailto:${CONFIG.emailContact}`} className="is-m">
@@ -213,7 +244,7 @@ const Sidebar = ({ isMobile = false }) => {
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-7.07 4.42c-.32.2-.74.2-1.06 0L4.4 8.25c-.25-.16-.4-.43-.4-.72 0-.67.73-1.07 1.3-.72L12 11l6.7-4.19c.57-.35 1.3.05 1.3.72 0 .29-.15.56-.4.72z" />
             </svg>
-            <span>Contact</span>
+            <span>Liên hệ</span>
           </MenuLink>
 
           <MenuLink to="/about" className="is-m">
@@ -227,7 +258,7 @@ const Sidebar = ({ isMobile = false }) => {
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.23 15.39L12 15.45l-3.22 1.94c-.38.23-.85-.11-.75-.54l.85-3.66-2.83-2.45c-.33-.29-.15-.84.29-.88l3.74-.32 1.46-3.45c.17-.41.75-.41.92 0l1.46 3.44 3.74.32c.44.04.62.59.28.88l-2.83 2.45.85 3.67c.1.43-.36.77-.74.54z" />
             </svg>
-            <span>About</span>
+            <span>Về SnackTalk</span>
           </MenuLink>
 
           <Separator
@@ -239,47 +270,49 @@ const Sidebar = ({ isMobile = false }) => {
 
           {loggedIn && lists.length > 0 && (
             <>
-              <div className="sidebar-topic">My Lists</div>
+              <div className="sidebar-topic">Danh sách của tôi</div>
               {lists.map((list) => (
                 <Link
                   key={list.id}
                   className="sidebar-item with-image"
                   to={`/@${user.username}/lists/${list.name}`}
                 >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M21 5.25H14C13.59 5.25 13.25 4.91 13.25 4.5C13.25 4.09 13.59 3.75 14 3.75H21C21.41 3.75 21.75 4.09 21.75 4.5C21.75 4.91 21.41 5.25 21 5.25Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M21 10.25H14C13.59 10.25 13.25 9.91 13.25 9.5C13.25 9.09 13.59 8.75 14 8.75H21C21.41 8.75 21.75 9.09 21.75 9.5C21.75 9.91 21.41 10.25 21 10.25Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M21 15.25H3C2.59 15.25 2.25 14.91 2.25 14.5C2.25 14.09 2.59 13.75 3 13.75H21C21.41 13.75 21.75 14.09 21.75 14.5C21.75 14.91 21.41 15.25 21 15.25Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M21 20.25H3C2.59 20.25 2.25 19.91 2.25 19.5C2.25 19.09 2.59 18.75 3 18.75H21C21.41 18.75 21.75 19.09 21.75 19.5C21.75 19.91 21.41 20.25 21 20.25Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M7.92 3.5H5.08C3.68 3.5 3 4.18 3 5.58V8.43C3 9.83 3.68 10.51 5.08 10.51H7.93C9.33 10.51 10.01 9.83 10.01 8.43V5.58C10 4.18 9.32 3.5 7.92 3.5Z"
-                      fill="currentColor"
-                    />
-                  </svg>
+                  <div className="sidebar-item-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M21 5.25H14C13.59 5.25 13.25 4.91 13.25 4.5C13.25 4.09 13.59 3.75 14 3.75H21C21.41 3.75 21.75 4.09 21.75 4.5C21.75 4.91 21.41 5.25 21 5.25Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M21 10.25H14C13.59 10.25 13.25 9.91 13.25 9.5C13.25 9.09 13.59 8.75 14 8.75H21C21.41 8.75 21.75 9.09 21.75 9.5C21.75 9.91 21.41 10.25 21 10.25Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M21 15.25H3C2.59 15.25 2.25 14.91 2.25 14.5C2.25 14.09 2.59 13.75 3 13.75H21C21.41 13.75 21.75 14.09 21.75 14.5C21.75 14.91 21.41 15.25 21 15.25Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M21 20.25H3C2.59 20.25 2.25 19.91 2.25 19.5C2.25 19.09 2.59 18.75 3 18.75H21C21.41 18.75 21.75 19.09 21.75 19.5C21.75 19.91 21.41 20.25 21 20.25Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M7.92 3.5H5.08C3.68 3.5 3 4.18 3 5.58V8.43C3 9.83 3.68 10.51 5.08 10.51H7.93C9.33 10.51 10.01 9.83 10.01 8.43V5.58C10 4.18 9.32 3.5 7.92 3.5Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
                   <span>{list.displayName}</span>
                 </Link>
               ))}
             </>
           )}
-          <div className="sidebar-topic">{loggedIn ? 'My communities' : 'Communities'}</div>
+          <div className="sidebar-topic">{loggedIn ? 'Cộng đồng của tôi' : 'Cộng đồng'}</div>
           {renderCommunitiesList()}
 
           <div

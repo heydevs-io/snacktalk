@@ -127,7 +127,7 @@ const SelectCommunity = ({ initial = '', onFocus, onChange, disabled = false }) 
           ref={inputRef}
           className={'card' + (isActive ? ' is-active' : '')}
           type="text"
-          placeholder="Select a community"
+          placeholder="Chọn cộng đồng ..."
           onFocus={handleFocus}
           onChange={handleChange}
           value={value}

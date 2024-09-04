@@ -107,13 +107,7 @@ const Navbar = ({ offline = false }) => {
           <div className="hamburger-m">
             <ButtonHamburger onClick={handleHamburgerClick} />
           </div>
-          <Link
-            to="/"
-            className="navbar-logo"
-            style={{ fontSize: '1.65rem' }}
-            onClick={handleLogoClick}
-          >
-            {/* {CONFIG.siteName} */}
+          <Link to="/" className="navbar-logo" onClick={handleLogoClick}>
             <SvgLogo width={50} />
           </Link>
           <Search />
@@ -143,14 +137,18 @@ const Navbar = ({ offline = false }) => {
                 className="navbar-profile"
                 target={
                   <div className="navbar-profile-target">
-                    <CommunityProPic
-                      name={user.username}
-                      proPic={user.proPic}
-                      size="small"
-                      style={{
-                        '--image-size': '30px',
-                      }}
-                    />
+                    <div className="navbar-profile-image">
+                      <CommunityProPic
+                        name={user.username}
+                        proPic={user.proPic}
+                        size="small"
+                        style={{
+                          '--image-size': '36px',
+                          'border-radius': '50%',
+                          border: '1px solid #E4E4E4',
+                        }}
+                      />
+                    </div>
 
                     <span className="navbar-name">
                       {windowWidth < 400 || (isMobile && user.username.length > 10)
@@ -164,10 +162,10 @@ const Navbar = ({ offline = false }) => {
               >
                 <div className="dropdown-list">
                   <Link className="link-reset dropdown-item" to="/settings">
-                    Settings
+                    Cài đặt
                   </Link>
                   <Link className="link-reset dropdown-item" to={`/@${user.username}`}>
-                    Profile
+                    Thông tin cá nhân
                   </Link>
                   <div className="dropdown-list-sep"></div>
                   <div
@@ -177,7 +175,7 @@ const Navbar = ({ offline = false }) => {
                     onClick={handleLogout}
                     onKeyUp={(e) => onKeyEnter(e, handleLogout)}
                   >
-                    Logout
+                    Đăng xuất tài khoản
                   </div>
                 </div>
               </Dropdown>
@@ -186,17 +184,24 @@ const Navbar = ({ offline = false }) => {
             <>
               <button
                 className="button-text"
+                style={{
+                  padding: '0',
+                }}
                 onClick={() => dispatch(loginModalOpened())}
                 disabled={offline}
               >
-                Login
+                Đăng nhập
               </button>
               <button
-                className="button-main"
+                className="button-text"
+                style={{
+                  color: 'var(--color-brand)',
+                  padding: '0',
+                }}
                 onClick={() => dispatch(signupModalOpened())}
                 disabled={offline}
               >
-                Create account
+                Tạo tài khoản
               </button>
             </>
           )}

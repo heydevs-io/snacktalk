@@ -13,7 +13,7 @@
     .user-card {
         display: flex;
         flex-direction: column;
-        margin-left: var(--post-card-votes-margin);
+        // margin-left: var(--post-card-votes-margin);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         > * {
@@ -89,7 +89,7 @@
             margin-bottom: var(--gap);
         }
         .comment {
-            margin-left: var(--post-card-votes-margin);
+            // margin-left: var(--post-card-votes-margin);
         }
         @include mixins.tablet() {
             .comment {
@@ -98,7 +98,7 @@
         }
     }
     .select-bar {
-        margin-left: var(--post-card-votes-margin);
+        // margin-left: var(--post-card-votes-margin);
         @include mixins.tablet {
             margin-left: 0;
         }

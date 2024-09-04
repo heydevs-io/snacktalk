@@ -63,7 +63,7 @@ const PostCardHeadingDetails = ({
       <div className="left">
         <CommunityLink name={post.communityName} proPic={post.communityProPic} />
         <div className="post-card-heading-by">
-          <span>Posted by </span>
+          <span>• Đăng bởi </span>
           <UserLink
             className={post.userDeleted && viewerAdmin ? 'is-red' : ''}
             username={isUsernameGhost ? 'Ghost' : post.username}
@@ -84,12 +84,12 @@ const PostCardHeadingDetails = ({
           <TimeAgo
             className="post-card-heading-ago"
             time={post.editedAt}
-            prefix="Edited "
+            prefix="Đã chỉnh sửa "
             suffix=""
             short
           />
         )}
-        {isPinned && <div className="post-card-heading-pinned">Pinned</div>}
+        {isPinned && <div className="post-card-heading-pinned">Đã ghim</div>}
       </div>
       <div className="right">
         {loggedIn && (
@@ -107,14 +107,14 @@ const PostCardHeadingDetails = ({
                 className="button-clear dropdown-item"
                 onClick={() => dispatch(saveToListModalOpened(post.id, 'post'))}
               >
-                Save to list
+                Lưu vào danh sách
               </button>
               {onRemoveFromList && (
                 <button
                   className="button-clear dropdown-item"
                   onClick={() => onRemoveFromList(post.id)}
                 >
-                  Remove from list
+                  Xóa khỏi danh sách
                 </button>
               )}
             </div>
