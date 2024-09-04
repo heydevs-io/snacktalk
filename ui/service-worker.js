@@ -79,11 +79,7 @@ const shouldCache = (request) => {
   return false;
 };
 
-const cacheFirst = async ({ request: oldRequest, preloadResponsePromise }) => {
-  const url = oldRequest?.url.includes('localhost:8080/images') ? oldRequest.url : undefined;
-  const newURL = url && url.replace('localhost:8080/images', 'localhost:8090/images');
-  const request = newURL ? new Request(newURL, { ...oldRequest, url: newURL }) : oldRequest;
-
+const cacheFirst = async ({ request: request, preloadResponsePromise }) => {
   const cachedRes = await caches.match(request);
   if (cachedRes) {
     return cachedRes;
@@ -98,7 +94,7 @@ const cacheFirst = async ({ request: oldRequest, preloadResponsePromise }) => {
       }
       return preloadResponse;
     }
-  } catch (_) {}
+  } catch (_) { }
 
   try {
     const networkRes = await fetch(request);
@@ -108,7 +104,7 @@ const cacheFirst = async ({ request: oldRequest, preloadResponsePromise }) => {
     }
     return networkRes;
   } catch (error) {
-    if (oldRequest.method === 'GET' && oldRequest.headers.get('accept').includes('text/html')) {
+    if (request.method === 'GET' && request.headers.get('accept').includes('text/html')) {
       const cache = await caches.open(CACHE_VERSION);
       const fallbackRes = await cache.match('/');
       if (fallbackRes) return fallbackRes;
@@ -194,14 +190,12 @@ const getNotificationInfo = (notification, csrfToken) => {
       break;
     case 'new_votes':
       if (notif.targetType === 'post') {
-        ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${
-          notif.post.title
-        }'`;
+        ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${notif.post.title
+          }'`;
         setToURL(`/${notif.post.communityName}/post/${notif.post.publicId}`);
       } else {
-        ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${
-          notif.post.title
-        }'`;
+        ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${notif.post.title
+          }'`;
         setToURL(
           `/${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`
         );

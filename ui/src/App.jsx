@@ -95,10 +95,7 @@ const App = () => {
       // See if user is logged in. This is the first API call.
       try {
         // const initial = await mfetchjson('/api/_initial');
-        const res = await fetch('http://localhost:8090/api/_initial', {
-          credentials: 'include',
-        });
-        // const res = await fetch('/api/_initial');
+        const res = await fetch('/api/_initial');
 
         if (!res.ok) {
           if (res.status === 408) {
