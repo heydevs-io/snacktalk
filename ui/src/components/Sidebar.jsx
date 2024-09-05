@@ -87,6 +87,7 @@ const Sidebar = ({ isMobile = false }) => {
             <svg
               style={{
                 transform: expanded ? 'rotate(180deg)' : 'none',
+                marginRight: '8px',
               }}
               width="24"
               height="24"
@@ -99,7 +100,7 @@ const Sidebar = ({ isMobile = false }) => {
                 fill="currentColor"
               />
             </svg>
-            <span>{expanded ? 'Show less' : `Show ${lengthLeft} more`}</span>
+            <span>{expanded ? 'Thu gọn' : `Hiển thị thêm ${lengthLeft}`}</span>
           </div>
         )}
       </>

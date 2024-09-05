@@ -32,7 +32,7 @@ const ShowMoreBox = ({ maxHeight = '300px', children, showButton = false, ...pro
       {showButton && wasOverflowing && (
         <div className="showmorebox-button">
           <button className="button-clear" onClick={() => setShowAll((x) => !x)}>
-            {showAll ? 'Show less' : 'Show more'}
+            {showAll ? 'Thu gọn' : 'Xem thêm'}
           </button>
         </div>
       )}
