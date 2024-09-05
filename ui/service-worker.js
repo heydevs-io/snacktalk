@@ -189,14 +189,12 @@ const getNotificationInfo = (notification, csrfToken) => {
       break;
     case 'new_votes':
       if (notif.targetType === 'post') {
-        ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${
-          notif.post.title
-        }'`;
+        ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${notif.post.title
+          }'`;
         setToURL(`/${notif.post.communityName}/post/${notif.post.publicId}`);
       } else {
-        ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${
-          notif.post.title
-        }'`;
+        ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${notif.post.title
+          }'`;
         setToURL(
           `/${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`
         );

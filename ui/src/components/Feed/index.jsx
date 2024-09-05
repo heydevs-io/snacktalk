@@ -102,7 +102,7 @@ const Feed = ({
           <Spinner />
         </div>
       )}
-      {items.length > 0 && !hasMore && <div className="feed-no-more">No more posts</div>}
+      {items.length > 0 && !hasMore && <div className="feed-no-more">Không có bài viết</div>}
       {items.length === 0 && <div className="card card-padding feed-none">{emptyItemsText}</div>}
     </div>
   );

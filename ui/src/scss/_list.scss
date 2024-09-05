@@ -111,7 +111,7 @@
     padding-top: 0;
     .page-middle {
         .list-head {
-            margin-left: var(--post-card-votes-margin);
+            // margin-left: var(--post-card-votes-margin);
             border-top-left-radius: 0;
             border-top-right-radius: 0;
             display: flex;
@@ -166,7 +166,7 @@
     .lists-feed {
         margin-top: var(--gap);
         .comment {
-            margin-left: var(--post-card-votes-margin);
+            // margin-left: var(--post-card-votes-margin);
             @include mixins.tablet {
                 margin-left: 0;
             }

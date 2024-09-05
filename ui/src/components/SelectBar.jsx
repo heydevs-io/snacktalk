@@ -18,7 +18,7 @@ const SelectBar = ({ name, options, value, onChange, ...rest }) => {
     return (
       <nav className="select-bar-m">
         <div className="select-bar-name">{name}</div>
-        <Dropdown target={<button className="select-bar-dp-target">Sort: {text}</button>}>
+        <Dropdown target={<button className="select-bar-dp-target">Sắp xếp: {text}</button>}>
           <div className="dropdown-list">
             {options.map((option) => (
               <div className="dropdown-item" key={option.id} onClick={() => handleClick(option.id)}>
@@ -49,7 +49,6 @@ const SelectBar = ({ name, options, value, onChange, ...rest }) => {
 
   return (
     <nav className="select-bar" {...rest}>
-      <div className="select-bar-name">{name}</div>
       <div className="select-bar-options">{options.map((option) => renderItem(option))}</div>
     </nav>
   );

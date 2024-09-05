@@ -119,7 +119,7 @@ export const GhostUserProPic = ({ className, ...rest }) => {
           version="1.1"
           preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
-        ></svg>
+        />
       </div>
     </div>
   );

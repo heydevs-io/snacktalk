@@ -48,7 +48,7 @@
 .post {
     margin-bottom: var(--card-margin);
     display: grid;
-    grid-template-columns: max-content 1fr;
+    // grid-template-columns: max-content 1fr;
     margin-bottom: calc(2 * var(--gap));
     @include mixins.tablet() {
         .post-votes {

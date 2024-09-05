@@ -24,23 +24,30 @@ const WelcomeBanner = ({ className, children, hideIfMember = false, ...props }) 
     <div
       className={
         'card card-sub card-padding home-welcome' +
-        (!loggedIn ? ' is-guest' : '') +
+        // (!loggedIn ? ' is-guest' : '') +
         (className ? ` ${className}` : '')
       }
       {...props}
     >
       <div className="home-welcome-text">
         <div className="home-welcome-join">
-          <span>Join the</span> <SvgLogo />
+          <span>Tham gia</span> <SvgLogo />
         </div>
         <div className="home-welcome-subtext">
-          Discover the best place to find cool stuff and discuss things..
+          Khám phá nơi tốt nhất để tìm những thứ thú vị và thảo luận về mọi thứ.
         </div>
       </div>
       <div className="home-welcome-buttons">
         {loggedIn && (
-          <Link to="/new" className="button button-main">
-            Create post
+          <Link
+            to="/new"
+            className="button button-main"
+            style={{
+              paddingTop: '14px',
+              paddingBottom: '14px',
+            }}
+          >
+            Đăng bài
           </Link>
         )}
         {canCreateForum && (
@@ -48,14 +55,27 @@ const WelcomeBanner = ({ className, children, hideIfMember = false, ...props }) 
             <button
               onClick={() => dispatch(createCommunityModalOpened())}
               className={'button' + (loggedIn ? ' button-main' : '')}
+              style={{
+                paddingTop: '14px',
+                paddingBottom: '14px',
+              }}
             >
-              Create community
+              Tạo cộng đồng
             </button>
           </>
         )}
         <>{children}</>
         {!loggedIn && (
-          <button onClick={() => dispatch(signupModalOpened())}>Create new account</button>
+          <button
+            className="button-main"
+            style={{
+              paddingTop: '14px',
+              paddingBottom: '14px',
+            }}
+            onClick={() => dispatch(signupModalOpened())}
+          >
+            Tạo tài khoản
+          </button>
         )}
       </div>
     </div>

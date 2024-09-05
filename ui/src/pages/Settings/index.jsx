@@ -276,22 +276,22 @@ const Settings = () => {
   return (
     <div className="page-content wrap page-settings">
       <Helmet>
-        <title>Settings</title>
+        <title>Cài đặt</title>
       </Helmet>
       <div className="account-settings card">
-        <h1>Account settings</h1>
+        <h1>Cài đặt tài khoản</h1>
         <div className="settings-propic">
           <CommunityProPic name={user.username} proPic={user.proPic} size="standard" />
           <ButtonUpload onChange={handleProPicUpload} disabled={isProPicUploading}>
-            Change
+            Cập nhật
           </ButtonUpload>
           <button onClick={handleProPicDelete} disabled={isProPicUploading}>
-            Delete
+            Xóa
           </button>
         </div>
         <div className="flex-column">
           <Input label="Username" value={user.username || ''} disabled />
-          <p className="input-desc">Username cannot be changed.</p>
+          <p className="input-desc">Username không được cập nhật</p>
         </div>
         <div className="flex-column">
           <Input
@@ -303,11 +303,11 @@ const Settings = () => {
         </div>
         <div className="input-with-label">
           <div className="input-label-box">
-            <div className="label">About me</div>
+            <div className="label">Thông tin của tôi</div>
           </div>
           <textarea
             rows="5"
-            placeholder="Write something about yourself..."
+            placeholder="Viết vài dòng về bản thân bạn"
             value={aboutMe}
             onChange={(e) => setAboutMe(e.target.value)}
           />
@@ -316,11 +316,11 @@ const Settings = () => {
         <DeleteAccount user={user} />
         <div className="input-with-label settings-prefs">
           <div className="input-label-box">
-            <div className="label">Preferences</div>
+            <div className="label">Tùy chọn</div>
           </div>
           <div className="settings-list">
             <div>
-              <div>Home feed</div>
+              <div>Bảng tin</div>
               <Dropdown
                 aligned="right"
                 target={
@@ -339,7 +339,7 @@ const Settings = () => {
               </Dropdown>
             </div>
             <div className="checkbox is-check-last">
-              <label htmlFor="c3">Remember last feed sort</label>
+              <label htmlFor="c3">Ghi nhớ lần cuối sắp xếp bảng tin</label>
               <input
                 className="switch"
                 id="c3"
@@ -349,7 +349,7 @@ const Settings = () => {
               />
             </div>
             <div className="checkbox is-check-last">
-              <label htmlFor="c4">Enable embeds</label>
+              <label htmlFor="c4">Chấp nhận nhúng</label>
               <input
                 className="switch"
                 id="c4"
@@ -359,7 +359,7 @@ const Settings = () => {
               />
             </div>
             <div className="checkbox is-check-last">
-              <label htmlFor="c5">Show user profile pictures</label>
+              <label htmlFor="c5">Hiển thị hình ảnh đại diện</label>
               <input
                 className="switch"
                 id="c5"
@@ -372,11 +372,11 @@ const Settings = () => {
         </div>
         <div className="input-with-label settings-device">
           <div className="input-label-box">
-            <div className="label">Device preferences</div>
+            <div className="label">Tùy chọn thiết bị</div>
           </div>
           <div className="settings-list">
             <div>
-              <div>Font</div>
+              <div>Phông chữ</div>
               <Dropdown
                 aligned="right"
                 target={<button className="select-bar-dp-target">{fontOptions[font]}</button>}
@@ -394,11 +394,11 @@ const Settings = () => {
         </div>
         <div className="input-with-label settings-notifs">
           <div className="input-label-box">
-            <div className="label">Notifications</div>
+            <div className="label">Tìm kiếm</div>
           </div>
           <div className="settings-list">
             <div className="checkbox is-check-last">
-              <label htmlFor="c1">Enable upvote notifications</label>
+              <label htmlFor="c1">Bật thông báo bình chọn</label>
               <input
                 className="switch"
                 id="c1"
@@ -408,7 +408,7 @@ const Settings = () => {
               />
             </div>
             <div className="checkbox is-check-last">
-              <label htmlFor="c2">Enable reply notifications</label>
+              <label htmlFor="c2">Kích hoạt thông báo phản hồi</label>
               <input
                 className="switch"
                 id="c2"
@@ -424,14 +424,14 @@ const Settings = () => {
             )*/}
             {canEnableWebPushNotifications && (
               <button onClick={handleEnablePushNotifications} style={{ alignSelf: 'flex-start' }}>
-                Enable push notifications
+                Kích hoạt thông báo đẩy
               </button>
             )}
           </div>
         </div>
         <div className="input-with-label settings-prefs">
           <div className="input-label-box">
-            <div className="label">Muted communities</div>
+            <div className="label">Cộng đồng bị tắt tiếng</div>
           </div>
           <div className="settings-list">
             {mutes.communityMutes.length === 0 && <div>None</div>}
@@ -441,7 +441,7 @@ const Settings = () => {
                 style={{ alignSelf: 'flex-end' }}
                 onClick={() => handleUnmuteAll('community')}
               >
-                Unmute all
+                Bỏ tắt tiếng tất cả
               </button>
             )}
           </div>
@@ -455,13 +455,13 @@ const Settings = () => {
             {mutes.userMutes.map((mute) => renderMute(mute))}
             {mutes.userMutes.length > 0 && (
               <button style={{ alignSelf: 'flex-end' }} onClick={() => handleUnmuteAll('user')}>
-                Unmute all
+                Bỏ tắt tiếng tất cả
               </button>
             )}
           </div>
         </div>
         <button className="button-main" disabled={!changed} onClick={handleSave}>
-          Save
+          Lưu
         </button>
       </div>
     </div>

@@ -319,6 +319,7 @@ function getCsrfCookieToken() {
 export function mfetch(url, options = {}) {
   return fetch(url, {
     ...options,
+    credentials: 'include',
     headers: {
       ...options.headers,
       'X-Csrf-Token': getCsrfCookieToken(),

@@ -118,7 +118,7 @@ const NotificationsView = () => {
     return (
       <div className={className}>
         <div className="notifs-head">
-          <div className="notifs-title">Notifications</div>
+          <div className="notifs-title">Thông báo</div>
         </div>
         <div className="notifs-body">
           <div className="notifs-list">{renderSkeletons()}</div>
@@ -130,21 +130,21 @@ const NotificationsView = () => {
   return (
     <div className={className}>
       <div className="notifs-head">
-        <div className="notifs-title">Notifications</div>
+        <div className="notifs-title">Thông báo</div>
         {count > 0 && (
           <Dropdown target={<ButtonMore />} aligned="right">
             <div className="dropdown-list">
               <button className="button-clear dropdown-item" onClick={() => handleMarkAllAsSeen()}>
-                Mark all as seen
+                Đánh dấu tất cả là đã đọc
               </button>
               <button
                 className="button-clear dropdown-item"
                 onClick={() => handleMarkAllAsSeen('new_votes')}
               >
-                Mark all upvotes as seen
+                Đánh dấu tất cả bình luận đã xem
               </button>
               <button className="button-clear dropdown-item" onClick={handleDeleteAll}>
-                Delete all
+                Xóa tất cả
               </button>
             </div>
           </Dropdown>
@@ -153,7 +153,7 @@ const NotificationsView = () => {
       <div className="notifs-body">
         {count === 0 && (
           <div className="notifs-empty">
-            <p>No notifications</p>
+            <p>Không có thông báo</p>
           </div>
         )}
         <div className="notifs-list">

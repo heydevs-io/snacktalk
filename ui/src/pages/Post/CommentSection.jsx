@@ -133,7 +133,7 @@ const CommentSection = ({
 
   // const totalRenders = useRef(0);
   const moreCommentsText =
-    moreCommentsLoading === 'loading' ? 'loading...' : `${noMoreReplies} more comments`;
+    moreCommentsLoading === 'loading' ? 'đang tải...' : `${noMoreReplies} bình luận khác`;
 
   return (
     <div className="post-comments-comments">

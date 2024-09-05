@@ -180,30 +180,30 @@ const NewPost = () => {
   const handleSubmit = async () => {
     if (isSubmitDisabled) return;
     if (isBanned) {
-      alert('You are banned from community');
+      alert('Bạn đã bị chặn ở cộng đồng này');
       return;
     }
     if (community === null) {
-      alert('Select a community first');
+      alert('Hãy chọn cộng đồng trước');
       return;
     }
     if (title.length < 3) {
       if (title.length === 0) {
-        alert('Your post needs a title');
+        alert('Bài viết cần tiêu đề');
         return;
       }
-      alert('Title is too short');
+      alert('Tiêu đề quá ngắn');
       return;
     }
     if (postType === 'image') {
       if (images.length === 0) {
-        alert("You haven't uploaded an image");
+        alert('Bạn chưa tải hình ảnh lên');
         return;
       }
     }
     if (postType === 'link') {
       if (link === '') {
-        alert('Please submit a valid URL');
+        alert('Bạn chưa nhập URL');
         return;
       }
     }
@@ -240,7 +240,7 @@ const NewPost = () => {
           if (res.status === 400) {
             const error = await res.json();
             if (error.code === 'invalid_url') {
-              dispatch(snackAlert('The URL you provided is not a valid URL.'));
+              dispatch(snackAlert('Vui lòng cung cấp một địa chỉ URL hợp lệ.'));
               return;
             }
           }
@@ -266,7 +266,7 @@ const NewPost = () => {
     return () => window.removeEventListener('keydown', listner);
   }, [handleSubmit]);
   const handleCancel = () => {
-    if (((changed || isUploading) && confirm('Are you sure you want to leave?')) || !changed) {
+    if (((changed || isUploading) && confirm('Bạn có chắc là muốn rời đi?')) || !changed) {
       if (isUploading) abortController.current.abort();
       if (window.appData.historyLength > 1) {
         history.goBack();
@@ -332,10 +332,12 @@ const NewPost = () => {
   return (
     <div className="page-new">
       <Helmet>
-        <title>{isEditPost ? 'Edit Post' : 'New Post'}</title>
+        <title>{isEditPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết'}</title>
       </Helmet>
       <div className="page-new-topbar">
-        <div className="page-new-topbar-title">{isEditPost ? 'Edit post' : 'Create a post'}</div>
+        <div className="page-new-topbar-title">
+          {isEditPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết'}
+        </div>
         <ButtonClose onClick={handleCancel} />
       </div>
       <div className="page-new-content">
@@ -366,7 +368,7 @@ const NewPost = () => {
                   <path d="M0 0h24v24H0z" fill="none" />
                   <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" />
                 </svg>
-                <span>Text</span>
+                <span>Văn bản</span>
               </button>
               {!isImagePostsDisabled && (
                 <button
@@ -388,7 +390,7 @@ const NewPost = () => {
                     <path d="M0 0h24v24H0V0z" fill="none" />
                     <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z" />
                   </svg>
-                  <span>Image</span>
+                  <span>Hình ảnh</span>
                 </button>
               )}
               <button
@@ -410,12 +412,12 @@ const NewPost = () => {
                   <path d="M0 0h24v24H0V0z" fill="none" />
                   <path d="M17 7h-4v2h4c1.65 0 3 1.35 3 3s-1.35 3-3 3h-4v2h4c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-6 8H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-2zm-3-4h8v2H8z" />
                 </svg>
-                <span>Link</span>
+                <span>Liên kết</span>
               </button>
             </div>
             <Textarea
               className="page-new-post-title"
-              placeholder="Post title goes here..."
+              placeholder="Tiêu đề của bài viết..."
               value={title}
               onChange={handleTitleChange}
               rows="1"
@@ -424,7 +426,7 @@ const NewPost = () => {
             {postType === 'text' && (
               <Textarea
                 className="page-new-post-body"
-                placeholder="Post content goes here (optional)..."
+                placeholder="Nội dung bài viết..."
                 value={body}
                 onChange={handleBodyChange}
                 onPaste={handleBodyPaste}
@@ -461,7 +463,7 @@ const NewPost = () => {
                       <path d="M0 0h24v24H0V0z" fill="none" />
                       <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z" />
                     </svg>
-                    <p>Deleted image</p>
+                    <p>Hình ảnh đã xóa</p>
                   </div>
                 )}
               </div>
@@ -484,17 +486,17 @@ const NewPost = () => {
             </div>
           )}
           <div className="new-page-help">
-            {'Use '}
+            {'Sử dụng'}
             <Link to="/markdown_guide" target="_blank">
               Markdown
             </Link>
-            {' to format posts.'}
+            {'để định dạng bài viết'}
           </div>
           <div className="page-new-buttons is-no-m">
             <button className="button-main" onClick={handleSubmit} disabled={isSubmitDisabled}>
-              Submit
+              Xác nhận
             </button>
-            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCancel}>Thoát</button>
           </div>
         </div>
         <div className="new-page-sidebar">
@@ -507,9 +509,9 @@ const NewPost = () => {
         </div>
         <div className="page-new-buttons is-m">
           <button className="button-main" onClick={handleSubmit} disabled={isSubmitDisabled}>
-            Submit
+            Xác nhận
           </button>
-          <button onClick={handleCancel}>Cancel</button>
+          <button onClick={handleCancel}>Thoát</button>
         </div>
       </div>
     </div>
@@ -590,14 +592,14 @@ const ImageUploadArea = ({ isUploading, onImagesUpload, disabled = false }) => {
               onChange={handleFileChange}
               disabled={disabled}
             />
-            <div>Add photo</div>
-            <div>Or drag and drop</div>
+            <div>Thêm hình ảnh</div>
+            <div>Hoặc kéo và thả xuống</div>
           </>
         )}
-        {disabled && <div>Maximum number of images reached.</div>}
+        {disabled && <div>Số ảnh tải lên đã đạt giới hạn.</div>}
         {isUploading && (
           <div className="flex flex-center page-new-image-uploading">
-            <div className="page-new-uploading-text">Uploading image</div>
+            <div className="page-new-uploading-text">Đang tải lên</div>
             <Spinner style={{ marginLeft: 5 }} size={25} />
           </div>
         )}

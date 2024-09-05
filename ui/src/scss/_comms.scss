@@ -13,7 +13,7 @@
         }
     }
     main {
-        margin-left: var(--post-card-margin-left);
+        // margin-left: var(--post-card-margin-left);
         @include mixins.mobile() {
             margin-left: 0;
         }

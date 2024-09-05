@@ -44,13 +44,12 @@ const Search = ({ autoFocus = false }) => {
       <Modal open={searchModalOpen} onClose={() => setSearchModalOpen(false)}>
         <div className="modal-card">
           <div className="modal-card-head">
-            <div className="modal-card-title">Search</div>
+            <div className="modal-card-title">Tìm kiếm</div>
             <ButtonClose onClick={() => setSearchModalOpen(false)} />
           </div>
           <div className="modal-card-content">
             <p style={{ marginBottom: 'var(--gap)' }}>
-              {`Search is yet to be implemented, but you can click the button below to search on
-              Google. It'll show only results from this website.`}
+              {`Tìm kiếm vẫn chưa được triển khai, nhưng bạn có thể nhấp vào nút bên dưới để tìm kiếm trên Google. Nó sẽ chỉ hiển thị kết quả từ trang web này.`}
             </p>
             <a
               className="button button-main"
@@ -60,7 +59,7 @@ const Search = ({ autoFocus = false }) => {
               ref={linkRef}
               onClick={() => setSearchModalOpen(false)}
             >
-              Search on Google for now
+              Tìm kiếm trên Google ngay bây giờ
             </a>
           </div>
         </div>
@@ -71,7 +70,7 @@ const Search = ({ autoFocus = false }) => {
           autoFocus={autoFocus}
           ref={inputRef}
           type="text"
-          placeholder="Type here to search..."
+          placeholder="Tìm kiếm..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => onKeyEnter(e, handleSearch)}
