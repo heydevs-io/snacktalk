@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCommunityModalOpened, signupModalOpened } from '../../slices/mainSlice';
+import { createCommunityModalOpened } from '../../slices/mainSlice';
 import Link from '../../components/Link';
-import MiniFooter from '../../components/MiniFooter';
 import Sidebar from '../../components/Sidebar';
 import PostsFeed from '../../views/PostsFeed';
-import LoginForm from '../../views/LoginForm';
 import WelcomeBanner from '../../views/WelcomeBanner';
 import { ButtonClose } from '../../components/Button';
 import { isDeviceIos, isDeviceStandalone } from '../../helper';
@@ -60,16 +58,16 @@ const Home = () => {
         {showInstallPrompt && (
           <div className="banner-install is-m">
             <div className="banner-install-text">
-              <p>Get the app for a better experience.</p>
+              <p>Tải ứng dụng để có trải nghiệm tốt hơn</p>
             </div>
             <ButtonAppInstall className="banner-install-button" deferredPrompt={deferredPrompt}>
-              Install
+              Cài đặt
             </ButtonAppInstall>
           </div>
         )}
         {loggedIn && (
           <Link className="button button-main home-btn-new-post is-m" to="/new">
-            Create post
+            Tạo bài viết
           </Link>
         )}
         {canCreateForum && (
@@ -78,7 +76,7 @@ const Home = () => {
               onClick={() => dispatch(createCommunityModalOpened())}
               className={'button button-main home-btn-new-post is-m'}
             >
-              Create community
+              Tạo cộng đồng
             </Link>
           </>
         )}
@@ -122,17 +120,17 @@ export const ButtonAppInstall = ({ deferredPrompt, children, ...props }) => {
       <Modal open={showIosModal} onClose={handleIosModalClose}>
         <div className="modal-card is-compact-mobile modal-ios-install">
           <div className="modal-card-head">
-            <div className="modal-card-title">Steps to install</div>
+            <div className="modal-card-title">Các bước trên iOS</div>
             <ButtonClose onClick={handleIosModalClose} />
           </div>
           <div className="modal-card-content">
             <div className="modal-ios-install-steps">
               <ol>
-                <li>1. Tap on the Safari share button.</li>
-                <li>2. Tap on &quot;Add to Home Screen.&quot;</li>
-                <li>3. Tap on &quot;Add.&quot;</li>
+                <li>1. Chọn nút chia sẻ Safari.</li>
+                <li>2. Chọn mục &quot;Thêm vào màn hình chính.&quot;</li>
+                <li>3. Chọn &quot;Thêm.&quot;</li>
               </ol>
-              <p>Note that web apps on iOS can only be installed using Safari.</p>
+              <p>Lưu ý rằng các ứng dụng web trên iOS chỉ có thể được cài đặt bằng Safari.</p>
             </div>
           </div>
           <div className="modal-card-actions">

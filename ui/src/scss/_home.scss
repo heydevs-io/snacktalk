@@ -283,14 +283,10 @@ a {
       }
 
       &.arrow-down {
-        color: linear-gradient(to bottom,
-            rgba(142, 152, 168, 0.7) 0%,
-            #383C42 100%);
+        color: linear-gradient(to bottom, rgba(142, 152, 168, 0.7) 0%, #383c42 100%);
 
         svg rect {
-          fill: linear-gradient(to bottom,
-              rgba(142, 152, 168, 0.7) 0%,
-              #383C42 100%);
+          fill: linear-gradient(to bottom, rgba(142, 152, 168, 0.7) 0%, #383c42 100%);
           transition: all 0.3s linear;
         }
       }
@@ -679,7 +675,7 @@ a {
 
   .post-card-text-content {
     font-size: 14px;
-    font-weight: 400
+    font-weight: 400;
   }
 
   .post-card-button-with-icon {
@@ -947,7 +943,7 @@ a {
   }
 
   .banner-install-text {
-    color: #000
+    color: #000;
   }
 
   .banner-install-button {

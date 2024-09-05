@@ -144,7 +144,7 @@ const Navbar = ({ offline = false }) => {
                         size="small"
                         style={{
                           '--image-size': '36px',
-                          'border-radius': '50%',
+                          borderRadius: '50%',
                           border: '1px solid #E4E4E4',
                         }}
                       />

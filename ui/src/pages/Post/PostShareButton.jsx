@@ -73,8 +73,9 @@ const PostShareButton = ({ isHiddenIcon, post }) => {
 
     const image = post.images[post.imageGalleryIndex];
     const url = image.url;
-    const filename = `discuit-${post.communityName}[${post.publicId}]-${post.imageGalleryIndex + 1
-      }.${image.format}`;
+    const filename = `discuit-${post.communityName}[${post.publicId}]-${
+      post.imageGalleryIndex + 1
+    }.${image.format}`;
     return (
       <a href={url} className="button-clear dropdown-item" download={filename}>
         Download image
