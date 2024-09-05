@@ -79,7 +79,7 @@ const shouldCache = (request) => {
   return false;
 };
 
-const cacheFirst = async ({ request: request, preloadResponsePromise }) => {
+const cacheFirst = async ({ request, preloadResponsePromise }) => {
   const cachedRes = await caches.match(request);
   if (cachedRes) {
     return cachedRes;
@@ -94,11 +94,10 @@ const cacheFirst = async ({ request: request, preloadResponsePromise }) => {
       }
       return preloadResponse;
     }
-  } catch (_) { }
+  } catch (_) {}
 
   try {
     const networkRes = await fetch(request);
-
     if (shouldCache(request)) {
       putInCache(request, networkRes.clone());
     }
