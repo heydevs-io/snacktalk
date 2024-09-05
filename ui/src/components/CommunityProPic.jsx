@@ -4,7 +4,7 @@ import favicon from '../assets/imgs/favicon.png';
 import { useImageLoaded } from '../hooks';
 import { selectImageCopyURL } from '../helper';
 
-const CommunityProPic = ({ className, name, proPic, size = 'small', style, ...rest }) => {
+const CommunityProPic = ({ className, name, proPic, size = 'small', ...rest }) => {
   let src = favicon;
   let averageColor = '#3d3d3d';
   if (proPic) {
@@ -28,11 +28,7 @@ const CommunityProPic = ({ className, name, proPic, size = 'small', style, ...re
   return (
     <div
       className={'profile-picture comm-propic' + (className ? ` ${className}` : '')}
-      style={{
-        backgroundColor: averageColor,
-        backgroundImage: loaded ? `url('${src}')` : 'none',
-        ...style,
-      }}
+      style={{ backgroundColor: averageColor, backgroundImage: loaded ? `url('${src}')` : 'none' }}
       {...rest}
     >
       <img alt={`${name}'s profile`} src={src} onLoad={handleLoad} />

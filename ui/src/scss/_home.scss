@@ -141,25 +141,18 @@ a {
   .home-welcome-text {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-
-    margin-bottom: 24px;
-
-    .home-welcome-join {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      font-weight: 600;
-      font-size: var(--fs-l);
-    }
-
-    .home-welcome-subtext {
-      opacity: 0.9;
-
-      span {
-        font-weight: 600;
-      }
+    border-radius: var(--border-radius);
+    .home-welcome-text {
+        .home-welcome-join {
+            font-weight: 600;
+            font-size: var(--fs-l);
+        }
+        .home-welcome-subtext {
+            opacity: 0.9;
+            span {
+                font-weight: 600;
+            }
+        }
     }
   }
 

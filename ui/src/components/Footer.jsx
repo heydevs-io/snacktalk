@@ -23,68 +23,32 @@ const Footer = () => {
         <div className="footer-col">
           <div className="footer-title">Social</div>
           {CONFIG.twitterURL && (
-            <a
-              href={CONFIG.twitterURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.twitterURL} className="footer-item" target="_blank" re="noopener">
               Twitter / X
             </a>
           )}
           {CONFIG.substackURL && (
-            <a
-              href={CONFIG.substackURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.substackURL} className="footer-item" target="_blank" re="noopener">
               Blog
             </a>
           )}
           {CONFIG.facebookURL && (
-            <a
-              href={CONFIG.facebookURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.facebookURL} className="footer-item" target="_blank" re="noopener">
               Facebook
             </a>
           )}
           {CONFIG.instagramURL && (
-            <a
-              href={CONFIG.instagramURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.instagramURL} className="footer-item" target="_blank" re="noopener">
               Instagram
             </a>
           )}
           {CONFIG.discordURL && (
-            <a
-              href={CONFIG.discordURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.discordURL} className="footer-item" target="_blank" re="noopener">
               Discord
             </a>
           )}
           {CONFIG.githubURL && (
-            <a
-              href={CONFIG.githubURL}
-              className="footer-item"
-              target="_blank"
-              re="noopener"
-              rel="noreferrer"
-            >
+            <a href={CONFIG.githubURL} className="footer-item" target="_blank" re="noopener">
               Github
             </a>
           )}
@@ -100,13 +64,7 @@ const Footer = () => {
           <Link className="footer-item" to="guidelines">
             Guidelines
           </Link>
-          <a
-            className="footer-item"
-            href="https://docs.discuit.net/"
-            target="_blank"
-            re="noopener"
-            rel="noreferrer"
-          >
+          <a className="footer-item" href="https://docs.discuit.net/" target="_blank" re="noopener">
             Documentation
           </a>
         </div>

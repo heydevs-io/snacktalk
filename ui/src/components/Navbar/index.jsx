@@ -21,9 +21,6 @@ import { homeReloaded } from '../../views/PostsFeed';
 import { useLocation } from 'react-router-dom';
 import { mobileBreakpointWidth, useTheme, useWindowWidth } from '../../hooks';
 import { clearNotificationsLocalStorage } from '../../PushNotifications';
-import { SvgLogo } from '../svg/logo';
-import { DownArrow } from '../svg/icons/down-arrow';
-import CommunityProPic from '../CommunityProPic';
 
 const Navbar = ({ offline = false }) => {
   const dispatch = useDispatch();
@@ -107,13 +104,18 @@ const Navbar = ({ offline = false }) => {
           <div className="hamburger-m">
             <ButtonHamburger onClick={handleHamburgerClick} />
           </div>
-          <Link to="/" className="navbar-logo" onClick={handleLogoClick}>
-            <SvgLogo width={50} />
+          <Link
+            to="/"
+            className="navbar-logo"
+            style={{ fontSize: '1.65rem' }}
+            onClick={handleLogoClick}
+          >
+            {CONFIG.siteName}
           </Link>
           <Search />
         </div>
         <div className="right">
-          {/* {process.env.NODE_ENV !== 'production' && (
+          {process.env.NODE_ENV !== 'production' && (
             <button
               className="button-text is-no-m"
               onClick={() => dispatch(chatOpenToggled())}
@@ -126,61 +128,8 @@ const Navbar = ({ offline = false }) => {
             <Link className="is-no-m" to="/elements">
               Elements
             </Link>
-          )} */}
-
-          {loggedIn ? (
-            <>
-              <Link to="/notifications" onClick={handleNotifIconClick}>
-                <ButtonNotifications count={notifsNewCount} />
-              </Link>
-              <Dropdown
-                className="navbar-profile"
-                target={
-                  <div className="navbar-profile-target">
-                    <div className="navbar-profile-image">
-                      <CommunityProPic
-                        name={user.username}
-                        proPic={user.proPic}
-                        size="small"
-                        style={{
-                          '--image-size': '36px',
-                          'border-radius': '50%',
-                          border: '1px solid #E4E4E4',
-                        }}
-                      />
-                    </div>
-
-                    <span className="navbar-name">
-                      {windowWidth < 400 || (isMobile && user.username.length > 10)
-                        ? 'me'
-                        : user.username}
-                    </span>
-                    <DownArrow />
-                  </div>
-                }
-                aligned="right"
-              >
-                <div className="dropdown-list">
-                  <Link className="link-reset dropdown-item" to="/settings">
-                    Cài đặt
-                  </Link>
-                  <Link className="link-reset dropdown-item" to={`/@${user.username}`}>
-                    Thông tin cá nhân
-                  </Link>
-                  <div className="dropdown-list-sep"></div>
-                  <div
-                    role="button"
-                    tabIndex="0"
-                    className="dropdown-item"
-                    onClick={handleLogout}
-                    onKeyUp={(e) => onKeyEnter(e, handleLogout)}
-                  >
-                    Đăng xuất tài khoản
-                  </div>
-                </div>
-              </Dropdown>
-            </>
-          ) : (
+          )}
+          {!loggedIn && (
             <>
               <button
                 className="button-text"
@@ -204,6 +153,64 @@ const Navbar = ({ offline = false }) => {
                 Tạo tài khoản
               </button>
             </>
+          )}
+          {/*<ButtonSearch />*/}
+          {loggedIn && (
+            <Link to="/notifications" onClick={handleNotifIconClick}>
+              <ButtonNotifications count={notifsNewCount} />
+            </Link>
+          )}
+          {loggedIn && (
+            <Dropdown
+              className="navbar-profile"
+              target={
+                <div className="navbar-profile-target">
+                  <span className="navbar-points">{`${kRound(user.points)} ${stringCount(
+                    user.points,
+                    true
+                  )}`}</span>
+                  <span className="navbar-name">
+                    @
+                    {windowWidth < 400 || (isMobile && user.username.length > 10)
+                      ? 'me'
+                      : user.username}
+                  </span>
+                </div>
+              }
+              aligned="right"
+            >
+              <div className="dropdown-list">
+                <Link className="link-reset dropdown-item" to="/settings">
+                  Settings
+                </Link>
+                <Link className="link-reset dropdown-item" to={`/@${user.username}`}>
+                  Profile
+                </Link>
+                {/*<div className="dropdown-item">Darkmode</div>*/}
+                <div className="dropdown-item is-non-reactive">
+                  <div className="checkbox">
+                    <input
+                      id={'ch-nav-dark'}
+                      className="switch"
+                      type="checkbox"
+                      checked={theme === 'dark'}
+                      onChange={handleDarkModeChange}
+                    />
+                    <label htmlFor={'ch-nav-dark'}>Dark mode</label>
+                  </div>
+                </div>
+                <div className="dropdown-list-sep"></div>
+                <div
+                  role="button"
+                  tabIndex="0"
+                  className="dropdown-item"
+                  onClick={handleLogout}
+                  onKeyUp={(e) => onKeyEnter(e, handleLogout)}
+                >
+                  Logout
+                </div>
+              </div>
+            </Dropdown>
           )}
         </div>
       </div>
