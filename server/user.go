@@ -398,6 +398,7 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 	phoneCode := values["phoneCode"]
 	phoneNumber := values["phoneNumber"]
 	captchaToken := values["captchaToken"]
+	fullName := ""
 
 	// Verify captcha.
 	if s.config.CaptchaSecret != "" {
@@ -416,7 +417,7 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 		return err
 	}
 
-	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber)
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber, fullName)
 	if err != nil {
 		return err
 	}
@@ -441,6 +442,7 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 	}
 
 	username := values["username"]
+	fullName := values["fullName"]
 	email := values["email"]
 	phoneCode := values["phoneCode"]
 	phoneNumber := values["phoneNumber"]
@@ -451,6 +453,11 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 		return err
 	}
 
+	// check if email had ben registered
+	if user, _ := core.GetUserByEmail(r.ctx, s.db, email, nil); user != nil {
+		return httperr.NewBadRequest("email_already_registered", "Email already registered")
+	}
+
 	ip := httputil.GetIP(r.req)
 	if err := s.rateLimit(r, "signup_1_"+ip, time.Minute, 2); err != nil {
 		return err
@@ -459,7 +466,7 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 		return err
 	}
 
-	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber)
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber, fullName)
 	if err != nil {
 		return err
 	}

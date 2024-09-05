@@ -39,16 +39,14 @@ func IdentifyUser(ctx context.Context, user *User) error {
 
 			data := map[string]interface{}{
 				"email":     user.Email,
-				"firstName": user.Username,
+				"firstName": user.FullName,
 				"phone":     phone,
 			}
 
-			subscriber, err := novuClient.SubscriberApi.Identify(ctx, user.ID.String(), data)
+			_, err := novuClient.SubscriberApi.Identify(ctx, user.ID.String(), data)
 			if err != nil {
 				return fmt.Errorf("failed to identify subscriber: %w", err)
 			}
-			fmt.Println(">>> subscriber", subscriber)
-			fmt.Println(123)
 		} else {
 			return fmt.Errorf("failed to get subscriber: %w", err)
 		}
