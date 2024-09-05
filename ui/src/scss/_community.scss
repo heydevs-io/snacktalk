@@ -25,7 +25,7 @@
     border-top: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    margin-left: var(--post-card-votes-margin);
+    // margin-left: var(--post-card-votes-margin);
     // margin-top: var(--navbar-height);
     @include mixins.tablet {
         margin-left: 0;
