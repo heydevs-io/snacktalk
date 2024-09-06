@@ -86,6 +86,7 @@ const Signup = ({ open, onClose }) => {
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new APIError(res.status, await res.json());
+      alert('Đăng ký thành công.');
       window.location.reload();
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -201,11 +202,11 @@ const Signup = ({ open, onClose }) => {
                 options={[
                   {
                     id: '+84',
-                    text: 'Vietnam (+84)',
+                    text: 'VN (+84)',
                   },
                   {
                     id: '+1',
-                    text: 'United States (+1)',
+                    text: 'USA (+1)',
                   },
                 ]}
                 value={phoneCode}
