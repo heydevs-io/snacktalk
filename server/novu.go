@@ -32,8 +32,8 @@ func (s *Server) IdentifyUser(ctx context.Context, user *core.User) error {
 		if strings.Contains(err.Error(), "status code 404") {
 
 			phone := ""
-			if user.PhoneCode != "" && user.PhoneNumber != "" {
-				phone = user.PhoneCode + user.PhoneNumber
+			if user.PhoneCode.Valid && user.PhoneNumber.Valid {
+				phone = user.PhoneCode.String + user.PhoneNumber.String
 			}
 
 			data := map[string]interface{}{

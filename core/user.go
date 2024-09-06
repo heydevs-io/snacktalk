@@ -102,8 +102,8 @@ type User struct {
 
 	FullName         msql.NullString `json:"fullName"`
 	EmailPublic      *string         `json:"email"`
-	PhoneCode        string          `json:"phoneCode"`
-	PhoneNumber      string          `json:"phoneNumber"`
+	PhoneCode        msql.NullString `json:"phoneCode"`
+	PhoneNumber      msql.NullString `json:"phoneNumber"`
 	Email            msql.NullString `json:"-"`
 	EmailConfirmedAt msql.NullTime   `json:"emailConfirmedAt"`
 	Password         string          `json:"-"`
