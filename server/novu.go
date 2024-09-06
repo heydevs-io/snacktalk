@@ -1,4 +1,4 @@
-package core
+package server
 
 import (
 	"context"
@@ -7,22 +7,21 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/discuitnet/discuit/core"
 	novu "github.com/novuhq/go-novu/lib"
 )
-
-const ApiKey = "737186c3a9ae8310ebe39e129f8afd47"
 
 type SubscriberResponse struct {
 	Data interface{} `json:"data"`
 }
 
-func IdentifyUser(ctx context.Context, user *User) error {
-	backendURL, err := url.Parse("https://novu-api.tscout.ai")
+func (s *Server) IdentifyUser(ctx context.Context, user *core.User) error {
+	backendURL, err := url.Parse(s.config.NovuApiUrl)
 	if err != nil {
 		log.Fatalf("Failed to parse URL: %v", err)
 	}
 
-	novuClient := novu.NewAPIClient(ApiKey, &novu.Config{
+	novuClient := novu.NewAPIClient(s.config.NovuApiKey, &novu.Config{
 		BackendURL: backendURL,
 	})
 
@@ -55,15 +54,15 @@ func IdentifyUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func HandleSendOtp(ctx context.Context, user *User, otp string) error {
-	IdentifyUser(ctx, user)
+func (s *Server) HandleSendOtp(ctx context.Context, user *core.User, otp string) error {
+	s.IdentifyUser(ctx, user)
 
-	backendURL, err := url.Parse("https://novu-api.tscout.ai")
+	backendURL, err := url.Parse(s.config.NovuApiUrl)
 	if err != nil {
 		log.Fatalf("Failed to parse URL: %v", err)
 	}
 
-	novuClient := novu.NewAPIClient(ApiKey, &novu.Config{
+	novuClient := novu.NewAPIClient(s.config.NovuApiKey, &novu.Config{
 		BackendURL: backendURL,
 	})
 

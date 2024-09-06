@@ -251,7 +251,9 @@ func (s *Server) requestOTP(w *responseWriter, r *request) error {
 	email := values["email"]
 
 	// check email domain
-	s.checkEmailDomain(r.ctx, email)
+	if err := s.checkEmailDomain(r.ctx, email); err != nil {
+		return err
+	}
 
 	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
 	if err != nil {
@@ -294,7 +296,7 @@ func (s *Server) requestOTP(w *responseWriter, r *request) error {
 		backgroundCtx := context.Background()
 
 		// Log the error if sending fails, but don't block the main process
-		if err := core.HandleSendOtp(backgroundCtx, user, otp); err != nil {
+		if err := s.HandleSendOtp(backgroundCtx, user, otp); err != nil {
 			log.Printf("Failed to send OTP: %v", err)
 		}
 	}(user, otp)
@@ -472,7 +474,7 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 	}
 
 	// Identify the user in Novu
-	err = core.IdentifyUser(r.ctx, user)
+	err = s.IdentifyUser(r.ctx, user)
 	if err != nil {
 		return err
 	}

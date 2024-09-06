@@ -76,6 +76,10 @@ type Config struct {
 
 	// redis otp ttl
 	OtpTTL int `yaml:"otpTTL"`
+
+	// novu
+	NovuApiKey string `yaml:"novuApiKey"`
+	NovuApiUrl string `yaml:"novuApiUrl"`
 }
 
 // Parse parses the yaml file at path and returns a Config.
