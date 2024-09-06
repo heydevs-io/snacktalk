@@ -48,6 +48,6 @@
   border-radius: 8px;
 }
 
-.switch-input:checked + .slider:before {
+.switch-input:checked+.slider:before {
   transform: translateX(26px);
 }
