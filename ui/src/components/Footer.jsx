@@ -9,19 +9,19 @@ const Footer = () => {
           <Link to="/" className="footer-logo">
             {CONFIG.siteName}
           </Link>
-          <div className="footer-description">Better discussions on the internet.</div>
+          <div className="footer-description">Cùng thảo luận trên SnackTalk</div>
         </div>
         <div className="footer-col">
-          <div className="footer-title">Organization</div>
+          <div className="footer-title">Tổ chức</div>
           <Link to="/about" className="footer-item">
-            About
+            Về chúng tôi
           </Link>
           <a href={`mailto:${CONFIG.emailContact}`} className="footer-item">
-            Contact
+            Liên hệ
           </a>
         </div>
         <div className="footer-col">
-          <div className="footer-title">Social</div>
+          <div className="footer-title">Liên kết</div>
           {CONFIG.twitterURL && (
             <a
               href={CONFIG.twitterURL}
@@ -90,15 +90,15 @@ const Footer = () => {
           )}
         </div>
         <div className="footer-col">
-          <div className="footer-title">Policies</div>
+          <div className="footer-title">Chính sách</div>
           <Link className="footer-item" to="/terms">
-            Terms
+            Điều khoản
           </Link>
           <Link className="footer-item" to="/privacy-policy">
-            Privacy
+            Quyền riêng tư
           </Link>
           <Link className="footer-item" to="guidelines">
-            Guidelines
+            Trợ giúp
           </Link>
           <a
             className="footer-item"
@@ -107,7 +107,7 @@ const Footer = () => {
             re="noopener"
             rel="noreferrer"
           >
-            Documentation
+            Tài liệu
           </a>
         </div>
       </div>

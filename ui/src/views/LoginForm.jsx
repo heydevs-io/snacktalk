@@ -2,50 +2,96 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import Input, { InputPassword } from '../components/Input';
-import { APIError, mfetch } from '../helper';
+import Input from '../components/Input';
+// { InputPassword }
+import { APIError, mfetch, validEmail } from '../helper';
 import { loginModalOpened, signupModalOpened, snackAlertError } from '../slices/mainSlice';
+import OtpInput from 'react-otp-input';
 
 const LoginForm = ({ isModal = false }) => {
   const dispatch = useDispatch();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [sessionId, setSessionId] = useState('');
+  // const [password, setPassword] = useState('');
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+
   const [loginError, setLoginError] = useState(null);
 
   useEffect(() => {
     setLoginError(null);
-  }, [username, password]);
+  }, [email, otp]);
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (email === '') {
+      setLoginError('Email không được để trống.');
+      return;
+    } else if (!validEmail(email)) {
+      setLoginError('Email không hợp lệ.');
+      return;
+    }
+
+    // request OTP
+    try {
+      //   let res = await mfetch('/api/_login', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json; charset=utf-8',
+      //     },
+      //     body: JSON.stringify({ email, otp, sessionId }),
+      //   });
+      //   if (res.ok) {
+      //     window.location.reload();
+      //   } else {
+      //     if (res.status === 401) {
+      //       setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      //     } else if (res.status === 403) {
+      //       const json = await res.json();
+      //       if (json.code === 'account_suspended') {
+      //         setLoginError(`${email} đã bị chặn.`);
+      //       } else {
+      //         throw new APIError(res.status, json);
+      //       }
+      //     } else {
+      //       throw new APIError(res.status, await res.json());
+      //     }
+      // }
+    } catch (error) {
+      dispatch(snackAlertError(error));
+      setOtpSent(false);
+    }
+  };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (username === '' && password === '') {
-      setLoginError('Username and password empty.');
+    if (otp === '') {
+      setLoginError('OTP không được để trống.');
       return;
-    } else if (username === '') {
-      setLoginError('Username empty.');
-      return;
-    } else if (password === '') {
-      setLoginError('Password empty.');
+    } else if (otp.length < 4) {
+      setLoginError('OTP không hợp lệ.');
       return;
     }
+
     try {
       let res = await mfetch('/api/_login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, otp, sessionId }),
       });
       if (res.ok) {
         window.location.reload();
       } else {
         if (res.status === 401) {
-          setLoginError('Username and password do not match.');
+          setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
         } else if (res.status === 403) {
           const json = await res.json();
           if (json.code === 'account_suspended') {
-            setLoginError(`@${username} is suspended.`);
+            setLoginError(`${email} đã bị chặn.`);
           } else {
             throw new APIError(res.status, json);
           }
@@ -58,11 +104,11 @@ const LoginForm = ({ isModal = false }) => {
     }
   };
 
-  const usernameRef = useRef();
+  const emailRef = useRef();
   const { pathname } = useLocation();
   useEffect(() => {
     if (pathname === '/login') {
-      usernameRef.current.focus();
+      emailRef.current.focus();
     }
   }, [pathname]);
 
@@ -74,24 +120,64 @@ const LoginForm = ({ isModal = false }) => {
 
   return (
     <form className="login-box modal-card-content" onSubmit={handleLoginSubmit}>
-      <Input
-        ref={usernameRef}
-        label="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        autoFocus={isModal}
-        autoComplete="username"
-      />
-      <InputPassword
+      {/* <InputPassword
         label="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
-      />
-      {loginError && <div className="form-error text-center">{loginError}</div>}
-      <input type="submit" className="button button-main" value="Login" />
+      /> */}
+      {!otpSent ? (
+        <>
+          <Input
+            ref={emailRef}
+            label="Email"
+            placeholder="Nhập email của bạn"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoFocus={isModal}
+          />
+          {loginError && <div className="form-error text-center">{loginError}</div>}
+          <button type="button" className="button button-main" onClick={handleSendOtp}>
+            Gửi mã OTP
+          </button>
+        </>
+      ) : (
+        <div className="login-box-verify">
+          <p className="form-desc" style={{ width: '100%', textAlign: 'center' }}>
+            Nhập mã OTP đã được gửi đến email của bạn
+          </p>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            numInputs={4}
+            containerStyle={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+            inputStyle={{
+              width: '5rem',
+              height: '5rem',
+              padding: 10,
+              borderRadius: 5,
+              fontSize: 24,
+              fontWeight: 'bold',
+              border: '1px solid #ccc',
+            }}
+            renderSeparator={<span>-</span>}
+            renderInput={(props) => <input {...props} />}
+          />
+          {loginError && <div className="form-error text-center">{loginError}</div>}
+          <input
+            type="submit"
+            className="button button-main block"
+            style={{ width: '100%' }}
+            value="Đăng nhập"
+          />
+        </div>
+      )}
       <button className="button-link modal-alt-link" onClick={handleOnSignup}>
-        {"Don't have an account? Signup"}
+        Bạn đã có tài khoản? Đăng ký ngay
       </button>
     </form>
   );

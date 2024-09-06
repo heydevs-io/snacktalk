@@ -568,7 +568,7 @@ const Post = () => {
                     canComment={canComment}
                   />
                   {post.noComments === 0 && (
-                    <div className="post-comments-none is-no-m">No comments yet.</div>
+                    <div className="post-comments-none is-no-m">Không có bình luận</div>
                   )}
                 </>
               ) : (

@@ -16,7 +16,7 @@ const Login = () => {
   return (
     <div className="page-content page-login wrap">
       <div className="card login-card">
-        <div className="title">Login to continue</div>
+        <div className="title">Đăng nhập để tiếp tục</div>
         <LoginForm onSucces={handleSuccess} />
       </div>
     </div>

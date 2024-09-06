@@ -101,17 +101,28 @@ a {
   .login-box {
     display: flex;
     flex-direction: column;
+    align-items: center;
 
     >* {
       margin-bottom: 8px;
 
       &:last-child {
-        margin-bottom: 0;
+        margin: 12px 0 0;
       }
     }
 
     .modal-alt-link {
       text-align: center;
+    }
+  }
+}
+
+.login-box-verify {
+  >* {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin: 12px 0 0;
     }
   }
 }
