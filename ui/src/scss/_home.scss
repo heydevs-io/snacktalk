@@ -270,13 +270,10 @@ a {
 
     &.arrow-voted {
       color: #fff;
+    }
 
-      // background: rgba(107, 2, 242, 0.1098039216);
-      // border-color: #6b02f21f;
-      svg path {
-        // stroke-width: 2px;
-        // stroke: var(--color-brand);
-      }
+    &.arrow-down-voted {
+      color: rgba(142, 152, 168, 0.7);
     }
 
     &:hover {
@@ -294,10 +291,10 @@ a {
       }
 
       &.arrow-down {
-        color: linear-gradient(to bottom, rgba(142, 152, 168, 0.7) 0%, #383c42 100%);
+        color: rgba(142, 152, 168, 0.7);
 
         svg rect {
-          fill: linear-gradient(to bottom, rgba(142, 152, 168, 0.7) 0%, #383c42 100%);
+          fill: #AA320C;
           transition: all 0.3s linear;
         }
       }
@@ -306,8 +303,8 @@ a {
         color: var(--color-brand);
       }
 
-      &.arrow-voted.arrow-down {
-        color: gray;
+      &.arrow-down-voted {
+        color: rgba(142, 152, 168, 0.7);
       }
     }
 

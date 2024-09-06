@@ -36,15 +36,16 @@ const LoginForm = ({ isModal = false }) => {
 
     // request OTP
     try {
+      setOtpSent(true);
       //   let res = await mfetch('/api/_login', {
       //     method: 'POST',
       //     headers: {
       //       'Content-Type': 'application/json; charset=utf-8',
       //     },
-      //     body: JSON.stringify({ email, otp, sessionId }),
+      //     body: JSON.stringify({ email }),
       //   });
       //   if (res.ok) {
-      //     window.location.reload();
+      //     setOtpSent(true);
       //   } else {
       //     if (res.status === 401) {
       //       setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
@@ -81,7 +82,13 @@ const LoginForm = ({ isModal = false }) => {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
         },
-        body: JSON.stringify({ email, otp, sessionId }),
+        body: JSON.stringify({
+          email,
+          username: 'hoitruong',
+          otp,
+          sessionId,
+          password: '12345678',
+        }),
       });
       if (res.ok) {
         window.location.reload();
