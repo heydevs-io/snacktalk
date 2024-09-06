@@ -55,7 +55,7 @@ const Signup = ({ open, onClose }) => {
   const [fullNameError, setFullNameError] = useState(null);
 
   const [phoneCode, setPhoneCode] = useState('+84');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState(null);
 
   useEffect(() => {
@@ -68,32 +68,20 @@ const Signup = ({ open, onClose }) => {
 
   useEffect(() => {
     setPhoneError(null);
-  }, [phone]);
+  }, [phoneNumber]);
 
-  // const [password, setPassword] = useState('');
-  // const [passwordError, setPasswordError] = useState(null);
-  // useEffect(() => {
-  //   setPasswordError(null);
-  // }, [password]);
-
-  // const [repeatPassword, setRepeatPassword] = useState('');
-  // const [repeatPasswordError, setRepeatPasswordError] = useState(null);
-  // useEffect(() => {
-  //   setRepeatPasswordError(null);
-  // }, [repeatPassword]);
-
-  const CAPTCHA_ENABLED = CONFIG.captchaSiteKey ? true : false;
+  const isCaptchaEnabled = !!CONFIG.captchaSiteKey;
   const captchaRef = useRef();
   const handleCaptchaVerify = (token) => {
     if (!token) {
       dispatch(snackAlert('Đã có lỗi xảy ra. Vui lòng thử lại sau.'));
       return;
     }
-    signInUser({ username, email, fullName, phoneCode, phone, token });
+    signInUser({ username, email, fullName, phoneCode, phoneNumber });
   };
   const signInUser = async (body) => {
     try {
-      const res = await mfetch('/api/_signup', {
+      const res = await mfetch('/api/_signup_v2', {
         method: 'POST',
         body: JSON.stringify(body),
       });
@@ -136,37 +124,16 @@ const Signup = ({ open, onClose }) => {
       setEmailError(errors[3]);
     }
 
-    if (!phone) {
+    if (!phoneNumber) {
       errFound = true;
       setPhoneError('Số điện thoại không được để trống');
     }
 
-    // if (!password) {
-    //   errFound = true;
-    //   setPasswordError(errors[1]);
-    // } else if (password.length < 8) {
-    //   errFound = true;
-    //   setPasswordError(errors[4]);
-    // }
-    // if (!repeatPassword) {
-    //   errFound = true;
-    //   setRepeatPasswordError(errors[5]);
-    // } else if (password !== repeatPassword) {
-    //   errFound = true;
-    //   setRepeatPasswordError(errors[6]);
-    // }
-    // if (email) {
-    //   if (!validEmail(email)) {
-    //     errFound = true;
-    //     setEmailError(errors[3]);
-    //   }
-    // }
-
     if (errFound) {
       return;
     }
-    if (!CAPTCHA_ENABLED) {
-      signInUser({ username, email, fullName, phoneCode, phone });
+    if (!isCaptchaEnabled) {
+      signInUser({ username, email, fullName, phoneCode, phoneNumber });
       return;
     }
     if (!captchaRef.current) {
@@ -245,30 +212,13 @@ const Signup = ({ open, onClose }) => {
                 onChange={setPhoneCode}
               />
               <Input
-                value={phone}
+                value={phoneNumber}
                 error={phoneError}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 style={{ marginBottom: 0, flex: 1 }}
               />
             </div>
-            {/* <InputPassword
-              label="Password"
-              value={password}
-              error={passwordError}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-            /> */}
-            {/* <InputPassword
-              label="Repeat password"
-              value={repeatPassword}
-              error={repeatPasswordError}
-              onChange={(e) => {
-                setRepeatPassword(e.target.value);
-              }}
-              style={{ marginBottom: 0 }}
-              autoComplete="new-password"
-            /> */}
-            {CAPTCHA_ENABLED && (
+            {isCaptchaEnabled && (
               <div style={{ margin: 0 }}>
                 <ReCAPTCHA
                   ref={captchaRef}

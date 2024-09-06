@@ -13,7 +13,7 @@ import {
   unmuteUser,
   userLoggedIn,
 } from '../../slices/mainSlice';
-import ChangePassword from './ChangePassword';
+// import ChangePassword from './ChangePassword';
 import DeleteAccount from './DeleteAccount';
 import {
   getNotificationsPermissions,
@@ -116,7 +116,7 @@ const Settings = () => {
     await getNotificationsPermissions(loggedIn, applicationServerKey);
   };
 
-  const handleDisablePushNotifications = () => {};
+  const handleDisablePushNotifications = () => { };
 
   const handleSave = async () => {
     if (email !== '' && !validEmail(email)) {
@@ -312,7 +312,7 @@ const Settings = () => {
             onChange={(e) => setAboutMe(e.target.value)}
           />
         </div>
-        <ChangePassword />
+        {/* <ChangePassword /> */}
         <DeleteAccount user={user} />
         <div className="input-with-label settings-prefs">
           <div className="input-label-box">

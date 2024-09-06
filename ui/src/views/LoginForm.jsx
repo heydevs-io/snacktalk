@@ -37,29 +37,25 @@ const LoginForm = ({ isModal = false }) => {
     // request OTP
     try {
       setOtpSent(true);
-      //   let res = await mfetch('/api/_login', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json; charset=utf-8',
-      //     },
-      //     body: JSON.stringify({ email }),
-      //   });
-      //   if (res.ok) {
-      //     setOtpSent(true);
-      //   } else {
-      //     if (res.status === 401) {
-      //       setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
-      //     } else if (res.status === 403) {
-      //       const json = await res.json();
-      //       if (json.code === 'account_suspended') {
-      //         setLoginError(`${email} đã bị chặn.`);
-      //       } else {
-      //         throw new APIError(res.status, json);
-      //       }
-      //     } else {
-      //       throw new APIError(res.status, await res.json());
-      //     }
-      // }
+      let res = await mfetch('/api/_request_otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        const body = await res.json();
+        if (!body.sessionId) {
+          setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+          throw new APIError(500, 'Session ID not found');
+        }
+        setSessionId(body.sessionId);
+        setOtpSent(true);
+      } else {
+        setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+        throw new APIError(res.status, await res.json());
+      }
     } catch (error) {
       dispatch(snackAlertError(error));
       setOtpSent(false);
@@ -77,34 +73,21 @@ const LoginForm = ({ isModal = false }) => {
     }
 
     try {
-      let res = await mfetch('/api/_login', {
+      let res = await mfetch('/api/_verify_otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
         },
         body: JSON.stringify({
-          email,
-          username: 'hoitruong',
           otp,
+          email,
           sessionId,
-          password: '12345678',
         }),
       });
       if (res.ok) {
         window.location.reload();
       } else {
-        if (res.status === 401) {
-          setLoginError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
-        } else if (res.status === 403) {
-          const json = await res.json();
-          if (json.code === 'account_suspended') {
-            setLoginError(`${email} đã bị chặn.`);
-          } else {
-            throw new APIError(res.status, json);
-          }
-        } else {
-          throw new APIError(res.status, await res.json());
-        }
+        setLoginError('OTP không hợp lệ.');
       }
     } catch (error) {
       dispatch(snackAlertError(error));
