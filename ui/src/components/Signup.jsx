@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ButtonClose } from './Button';
 import Input, { InputWithCount } from './Input';
@@ -21,9 +21,24 @@ const errors = [
   'Email không hợp lệ.',
 ];
 
+const initialState = {
+  email: '',
+  emailError: null,
+  fullName: '',
+  fullNameError: null,
+  phoneCode: '+84',
+  phoneNumber: '',
+  phoneError: null,
+};
+
+const reducer = (state, action) => ({
+  ...state,
+  ...action.payload,
+});
+
 const Signup = ({ open, onClose }) => {
   const dispatch = useDispatch();
-
+  const [reducerState, reducerDispatch] = useReducer(reducer, initialState);
   const [username, handleUsernameChange] = useInputUsername(usernameMaxLength);
   const [usernameError, setUsernameError] = useState(null);
   const checkUsernameExists = async () => {
@@ -44,28 +59,31 @@ const Signup = ({ open, onClose }) => {
     }
   };
   useDelayedEffect(checkUsernameExists, [username]);
-
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(null);
-
-  const [fullName, setFullName] = useState('');
-  const [fullNameError, setFullNameError] = useState(null);
-
   const [phoneCode, setPhoneCode] = useState('+84');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneError, setPhoneError] = useState(null);
 
   useEffect(() => {
-    setFullNameError(null);
-  }, [fullName]);
+    reducerDispatch({
+      payload: {
+        fullNameError: null,
+      },
+    });
+  }, [reducerState.fullName]);
 
   useEffect(() => {
-    setEmailError(null);
-  }, [email]);
+    reducerDispatch({
+      payload: {
+        emailError: null,
+      },
+    });
+  }, [reducerState.email]);
 
   useEffect(() => {
-    setPhoneError(null);
-  }, [phoneNumber]);
+    reducerDispatch({
+      payload: {
+        phoneError: null,
+      },
+    });
+  }, [reducerState.phoneNumber]);
 
   const isCaptchaEnabled = !!CONFIG.captchaSiteKey;
   const captchaRef = useRef();
@@ -74,7 +92,7 @@ const Signup = ({ open, onClose }) => {
       dispatch(snackAlert('Đã có lỗi xảy ra. Vui lòng thử lại sau.'));
       return;
     }
-    signInUser({ username, email, fullName, phoneCode, phoneNumber });
+    signInUser({ username, ...reducerState });
   };
   const signInUser = async (body) => {
     try {
@@ -95,6 +113,7 @@ const Signup = ({ open, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { fullName, email, phoneNumber } = reducerState;
     let errFound = false;
     if (!username) {
       errFound = true;
@@ -108,30 +127,50 @@ const Signup = ({ open, onClose }) => {
 
     if (!fullName) {
       errFound = true;
-      setFullNameError('Họ và tên không được để trống');
+      reducerDispatch({
+        payload: {
+          fullNameError: 'Họ và tên không được để trống',
+        },
+      });
     } else if (fullName.length < 10) {
       errFound = true;
-      setFullNameError('Họ và tên quá ngắn');
+      reducerDispatch({
+        payload: {
+          fullNameError: 'Họ và tên quá ngắn',
+        },
+      });
     }
 
     if (!email) {
       errFound = true;
-      setEmailError('Email không được để trống');
+      reducerDispatch({
+        payload: {
+          emailError: 'Email không được để trống',
+        },
+      });
     } else if (!validEmail(email)) {
       errFound = true;
-      setEmailError(errors[3]);
+      reducerDispatch({
+        payload: {
+          emailError: errors[3],
+        },
+      });
     }
 
     if (!phoneNumber) {
       errFound = true;
-      setPhoneError('Số điện thoại không được để trống');
+      reducerDispatch({
+        payload: {
+          phoneError: 'Số điện thoại không được để trống',
+        },
+      });
     }
 
     if (errFound) {
       return;
     }
     if (!isCaptchaEnabled) {
-      signInUser({ username, email, fullName, phoneCode, phoneNumber });
+      signInUser({ username, ...reducerState });
       return;
     }
     if (!captchaRef.current) {
@@ -174,17 +213,29 @@ const Signup = ({ open, onClose }) => {
             <Input
               label="Họ và tên"
               description="Tên đầy đủ của bạn."
-              value={fullName}
-              error={fullNameError}
-              onChange={(e) => setFullName(e.target.value)}
+              value={reducerState.fullName}
+              error={reducerState.fullNameError}
+              onChange={(e) =>
+                reducerDispatch({
+                  payload: {
+                    fullName: e.target.value,
+                  },
+                })
+              }
             />
             <Input
               type="email"
               label="Email"
               description="Địa chỉ email của bạn."
-              value={email}
-              error={emailError}
-              onChange={(e) => setEmail(e.target.value)}
+              value={reducerState.email}
+              error={reducerState.emailError}
+              onChange={(e) =>
+                reducerDispatch({
+                  payload: {
+                    email: e.target.value,
+                  },
+                })
+              }
             />
             <div
               style={{
@@ -210,9 +261,15 @@ const Signup = ({ open, onClose }) => {
                 onChange={setPhoneCode}
               />
               <Input
-                value={phoneNumber}
-                error={phoneError}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                value={reducerState.phoneNumber}
+                error={reducerState.phoneError}
+                onChange={(e) =>
+                  reducerDispatch({
+                    payload: {
+                      phoneNumber: e.target.value,
+                    },
+                  })
+                }
                 style={{ marginBottom: 0, flex: 1 }}
               />
             </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import Input from '../../components/Input';
-import { mfetch, mfetchjson, validEmail } from '../../helper';
+import { APIError, mfetch, mfetchjson, validEmail } from '../../helper';
 import { useIsChanged } from '../../hooks';
 import {
   mutesAdded,
@@ -115,8 +115,6 @@ const Settings = () => {
   const handleEnablePushNotifications = async () => {
     await getNotificationsPermissions(loggedIn, applicationServerKey);
   };
-
-  const handleDisablePushNotifications = () => { };
 
   const handleSave = async () => {
     if (email !== '' && !validEmail(email)) {

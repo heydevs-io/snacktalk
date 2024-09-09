@@ -20,7 +20,7 @@ const SelectOptions = ({ name, options, value, onChange }) => {
           </div>
         ))}
       </div>
-    </Dropdown >
+    </Dropdown>
   );
 };
 
