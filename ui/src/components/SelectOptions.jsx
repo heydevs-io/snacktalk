@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Dropdown from './Dropdown';
 
-const SelectOptions = ({ name, options, value, onChange }) => {
-  const text = value && options.filter((opt) => opt.id === value)[0].text;
+const SelectOptions = ({ options, value, onChange }) => {
+  const text = value && options.find((opt) => opt.id === value).text;
 
   return (
     <Dropdown
@@ -25,7 +25,7 @@ const SelectOptions = ({ name, options, value, onChange }) => {
 };
 
 SelectOptions.propTypes = {
-  name: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   options: PropTypes.array.isRequired,
 };

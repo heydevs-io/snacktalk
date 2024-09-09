@@ -246,7 +246,6 @@ const Signup = ({ open, onClose }) => {
               }}
             >
               <SelectOptions
-                name="phoneCode"
                 options={[
                   {
                     id: '+84',
