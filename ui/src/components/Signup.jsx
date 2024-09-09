@@ -16,12 +16,9 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 const errors = [
   'Username không được để trống',
-  'Password không được để trống',
+  'Mật khẩu không được để trống',
   'Username quá ngắn.',
   'Email không hợp lệ.',
-  'Password too weak.',
-  'Repeat password không được để trống',
-  'Passwords do not match.',
 ];
 
 const Signup = ({ open, onClose }) => {

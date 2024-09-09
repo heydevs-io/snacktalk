@@ -5,12 +5,6 @@ import Dropdown from './Dropdown';
 const SelectOptions = ({ name, options, value, onChange }) => {
   const text = value && options.filter((opt) => opt.id === value)[0].text;
 
-  const handleClick = (value) => {
-    if (onChange) {
-      onChange(value);
-    }
-  };
-
   return (
     <Dropdown
       target={
@@ -21,12 +15,12 @@ const SelectOptions = ({ name, options, value, onChange }) => {
     >
       <div className="dropdown-list">
         {options.map((option) => (
-          <div className="dropdown-item" key={option.id} onClick={() => handleClick(option.id)}>
+          <div className="dropdown-item" key={option.id} onClick={() => onChange?.(option.id)}>
             {option.text}
           </div>
         ))}
       </div>
-    </Dropdown>
+    </Dropdown >
   );
 };
 
