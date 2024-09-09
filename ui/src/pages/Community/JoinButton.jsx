@@ -15,7 +15,7 @@ const JoinButton = ({ className, community, ...rest }) => {
       dispatch(loginPromptToggled());
       return;
     }
-    const message = `You will no longer be a moderator of '${community.name}' if you leave the community. Are you sure you want to leave?`;
+    const message = `Bạn sẽ không còn là người điều hành của '${community.name}' nếu bạn rời khỏi cộng đồng. Bạn có chắc chắn muốn rời khỏi không?`;
     if (community.userMod && !confirm(message)) {
       return;
     }
@@ -35,7 +35,7 @@ const JoinButton = ({ className, community, ...rest }) => {
 
   return (
     <button onClick={handleFollow} className={cls} {...rest}>
-      {joined ? 'Joined' : 'Join'}
+      {joined ? 'Đã tham gia' : 'Tham gia'}
     </button>
   );
 };

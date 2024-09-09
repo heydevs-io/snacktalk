@@ -486,11 +486,11 @@ const NewPost = () => {
             </div>
           )}
           <div className="new-page-help">
-            {'Sử dụng'}
+            {'Sử dụng '}
             <Link to="/markdown_guide" target="_blank">
               Markdown
             </Link>
-            {'để định dạng bài viết'}
+            {' để định dạng bài viết'}
           </div>
           <div className="page-new-buttons is-no-m">
             <button className="button-main" onClick={handleSubmit} disabled={isSubmitDisabled}>

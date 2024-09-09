@@ -212,7 +212,8 @@ const Post = () => {
     (async () => {
       try {
         const res = await mfetch(
-          `/api/posts/${post.publicId}?action=${checked ? 'pin' : 'unpin'}&siteWide=${siteWide ? 'true' : 'false'
+          `/api/posts/${post.publicId}?action=${checked ? 'pin' : 'unpin'}&siteWide=${
+            siteWide ? 'true' : 'false'
           }`,
           { method: 'PUT' }
         );
@@ -268,19 +269,22 @@ const Post = () => {
   const getDeletedBannerText = (post) => {
     if (post.deletedContent) {
       if (post.deletedAs === post.deletedContentAs) {
-        return `This post and its ${post.type === 'image' ? 'image(s)' : post.type
-          } have been removed by ${userGroupSingular(post.deletedAs, true)}.`;
+        return `This post and its ${
+          post.type === 'image' ? 'image(s)' : post.type
+        } have been removed by ${userGroupSingular(post.deletedAs, true)}.`;
       } else {
-        return `This post has been removed by ${userGroupSingular(post.deletedAs, true)} and its ${post.type
-          } has been removed
+        return `This post has been removed by ${userGroupSingular(post.deletedAs, true)} and its ${
+          post.type
+        } has been removed
         by ${userGroupSingular(post.deletedContentAs, true)}.`;
       }
     }
     return `This post has been removed by ${userGroupSingular(post.deletedAs, true)}.`;
   };
 
-  const deletePostContentButtonText = `Delete ${post.type === 'image' ? (post.images.length > 1 ? 'images' : 'image') : post.type
-    }`;
+  const deletePostContentButtonText = `Delete ${
+    post.type === 'image' ? (post.images.length > 1 ? 'images' : 'image') : post.type
+  }`;
 
   return (
     <div className="page-content page-post wrap">
@@ -568,7 +572,7 @@ const Post = () => {
                     canComment={canComment}
                   />
                   {post.noComments === 0 && (
-                    <div className="post-comments-none is-no-m">No comments yet.</div>
+                    <div className="post-comments-none is-no-m">Không có bình luận</div>
                   )}
                 </>
               ) : (

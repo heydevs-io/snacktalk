@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import Input from '../../components/Input';
-import { mfetch, mfetchjson, validEmail } from '../../helper';
+import { APIError, mfetch, mfetchjson, validEmail } from '../../helper';
 import { useIsChanged } from '../../hooks';
 import {
   mutesAdded,
@@ -13,7 +13,7 @@ import {
   unmuteUser,
   userLoggedIn,
 } from '../../slices/mainSlice';
-import ChangePassword from './ChangePassword';
+// import ChangePassword from './ChangePassword';
 import DeleteAccount from './DeleteAccount';
 import {
   getNotificationsPermissions,
@@ -115,8 +115,6 @@ const Settings = () => {
   const handleEnablePushNotifications = async () => {
     await getNotificationsPermissions(loggedIn, applicationServerKey);
   };
-
-  const handleDisablePushNotifications = () => {};
 
   const handleSave = async () => {
     if (email !== '' && !validEmail(email)) {
@@ -312,7 +310,7 @@ const Settings = () => {
             onChange={(e) => setAboutMe(e.target.value)}
           />
         </div>
-        <ChangePassword />
+        {/* <ChangePassword /> */}
         <DeleteAccount user={user} />
         <div className="input-with-label settings-prefs">
           <div className="input-label-box">

@@ -41,7 +41,7 @@ const PostVotes = ({ className = '', post, disabled = false }) => {
 
   const points = upvotes - downvotes;
   const upCls = 'arrow-up' + (vote === true ? ' arrow-voted' : '');
-  const downCls = vote === false ? 'arrow-voted ' : '';
+  const downCls = 'arrow-down' + (vote === false ? ' arrow-down-voted' : '');
 
   return (
     <div className={'post-votes' + (className === '' ? '' : ' ' + className)}>
@@ -59,7 +59,7 @@ const PostVotes = ({ className = '', post, disabled = false }) => {
           {kRound(points)}
         </p>
         <button
-          className={'button-clear post-votes-arrow arrow-down' + downCls}
+          className={'button-clear post-votes-arrow ' + downCls}
           onClick={() => handleVote(false)}
           disabled={disabled}
         >

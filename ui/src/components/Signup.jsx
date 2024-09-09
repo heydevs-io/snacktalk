@@ -1,31 +1,44 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ButtonClose } from './Button';
-import Input, { InputPassword, InputWithCount } from './Input';
+import Input, { InputWithCount } from './Input';
 import Modal from './Modal';
 import { useDispatch } from 'react-redux';
 import { loginModalOpened, snackAlert, snackAlertError } from '../slices/mainSlice';
 import { APIError, mfetch, validEmail } from '../helper';
 import { useDelayedEffect, useInputUsername } from '../hooks';
 import { usernameMaxLength } from '../config';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import SelectOptions from './SelectOptions';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const errors = [
-  'Username cannot be empty.',
-  'Password cannot be empty.',
-  'Username too short.',
-  'Enter a valid email address.',
-  'Password too weak.',
-  'Repeat password cannot be empty.',
-  'Passwords do not match.',
+  'Username không được để trống',
+  'Mật khẩu không được để trống',
+  'Username quá ngắn.',
+  'Email không hợp lệ.',
 ];
+
+const initialState = {
+  email: '',
+  emailError: null,
+  fullName: '',
+  fullNameError: null,
+  phoneCode: '+84',
+  phoneNumber: '',
+  phoneError: null,
+};
+
+const reducer = (state, action) => ({
+  ...state,
+  ...action.payload,
+});
 
 const Signup = ({ open, onClose }) => {
   const dispatch = useDispatch();
-
+  const [reducerState, reducerDispatch] = useReducer(reducer, initialState);
   const [username, handleUsernameChange] = useInputUsername(usernameMaxLength);
   const [usernameError, setUsernameError] = useState(null);
   const checkUsernameExists = async () => {
@@ -39,48 +52,56 @@ const Signup = ({ open, onClose }) => {
         }
         throw new APIError(res.status, await res.json());
       }
-      setUsernameError(`${username} is already taken.`);
+      setUsernameError(`${username} đã được sử dụng.`);
       return true;
     } catch (error) {
       dispatch(snackAlertError(error));
     }
   };
   useDelayedEffect(checkUsernameExists, [username]);
+  const [phoneCode, setPhoneCode] = useState('+84');
 
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(null);
   useEffect(() => {
-    setEmailError(null);
-  }, [email]);
+    reducerDispatch({
+      payload: {
+        fullNameError: null,
+      },
+    });
+  }, [reducerState.fullName]);
 
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState(null);
   useEffect(() => {
-    setPasswordError(null);
-  }, [password]);
+    reducerDispatch({
+      payload: {
+        emailError: null,
+      },
+    });
+  }, [reducerState.email]);
 
-  const [repeatPassword, setRepeatPassword] = useState('');
-  const [repeatPasswordError, setRepeatPasswordError] = useState(null);
   useEffect(() => {
-    setRepeatPasswordError(null);
-  }, [repeatPassword]);
+    reducerDispatch({
+      payload: {
+        phoneError: null,
+      },
+    });
+  }, [reducerState.phoneNumber]);
 
-  const CAPTCHA_ENABLED = CONFIG.captchaSiteKey ? true : false;
+  const isCaptchaEnabled = !!CONFIG.captchaSiteKey;
   const captchaRef = useRef();
   const handleCaptchaVerify = (token) => {
     if (!token) {
-      dispatch(snackAlert('Something went wrong. Try again.'));
+      dispatch(snackAlert('Đã có lỗi xảy ra. Vui lòng thử lại sau.'));
       return;
     }
-    signInUser(username, email, password, token);
+    signInUser({ username, ...reducerState });
   };
-  const signInUser = async (username, email, password, captchaToken) => {
+  const signInUser = async (body) => {
     try {
-      const res = await mfetch('/api/_signup', {
+      const res = await mfetch('/api/_signup_v2', {
         method: 'POST',
-        body: JSON.stringify({ username, email, password, captchaToken }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new APIError(res.status, await res.json());
+      alert('Đăng ký thành công.');
       window.location.reload();
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -92,6 +113,7 @@ const Signup = ({ open, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { fullName, email, phoneNumber } = reducerState;
     let errFound = false;
     if (!username) {
       errFound = true;
@@ -102,31 +124,53 @@ const Signup = ({ open, onClose }) => {
     } else if ((await checkUsernameExists()) === true) {
       errFound = true;
     }
-    if (!password) {
+
+    if (!fullName) {
       errFound = true;
-      setPasswordError(errors[1]);
-    } else if (password.length < 8) {
+      reducerDispatch({
+        payload: {
+          fullNameError: 'Họ và tên không được để trống',
+        },
+      });
+    } else if (fullName.length < 10) {
       errFound = true;
-      setPasswordError(errors[4]);
+      reducerDispatch({
+        payload: {
+          fullNameError: 'Họ và tên quá ngắn',
+        },
+      });
     }
-    if (!repeatPassword) {
+
+    if (!email) {
       errFound = true;
-      setRepeatPasswordError(errors[5]);
-    } else if (password !== repeatPassword) {
+      reducerDispatch({
+        payload: {
+          emailError: 'Email không được để trống',
+        },
+      });
+    } else if (!validEmail(email)) {
       errFound = true;
-      setRepeatPasswordError(errors[6]);
+      reducerDispatch({
+        payload: {
+          emailError: errors[3],
+        },
+      });
     }
-    if (email) {
-      if (!validEmail(email)) {
-        errFound = true;
-        setEmailError(errors[3]);
-      }
+
+    if (!phoneNumber) {
+      errFound = true;
+      reducerDispatch({
+        payload: {
+          phoneError: 'Số điện thoại không được để trống',
+        },
+      });
     }
+
     if (errFound) {
       return;
     }
-    if (!CAPTCHA_ENABLED) {
-      signInUser(username, email, password);
+    if (!isCaptchaEnabled) {
+      signInUser({ username, ...reducerState });
       return;
     }
     if (!captchaRef.current) {
@@ -150,48 +194,85 @@ const Signup = ({ open, onClose }) => {
       <Modal open={open} onClose={onClose} noOuterClickClose={false}>
         <div className="modal-card modal-form modal-signup">
           <div className="modal-card-head">
-            <div className="modal-card-title">Signup</div>
+            <div className="modal-card-title">Đăng ký</div>
             <ButtonClose onClick={onClose} />
           </div>
           <form className="modal-card-content" onSubmit={handleSubmit}>
             <InputWithCount
               label="Username"
               maxLength={usernameMaxLength}
-              description="The name you will use when interacting with the community."
+              description="Tên người dùng của bạn. Bạn không thể thay đổi sau khi tạo."
               error={usernameError}
               value={username}
               onChange={handleUsernameChange}
-              onBlur={() => checkUsernameExists()}
+              onBlur={checkUsernameExists}
               autoFocus
               style={{ marginBottom: 0 }}
               autoComplete="username"
             />
             <Input
+              label="Họ và tên"
+              description="Tên đầy đủ của bạn."
+              value={reducerState.fullName}
+              error={reducerState.fullNameError}
+              onChange={(e) =>
+                reducerDispatch({
+                  payload: {
+                    fullName: e.target.value,
+                  },
+                })
+              }
+            />
+            <Input
               type="email"
-              label="Email (optional)"
-              description="Without an email address, there's no way to recover your account if you lose your password."
-              value={email}
-              error={emailError}
-              onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              description="Địa chỉ email của bạn."
+              value={reducerState.email}
+              error={reducerState.emailError}
+              onChange={(e) =>
+                reducerDispatch({
+                  payload: {
+                    email: e.target.value,
+                  },
+                })
+              }
             />
-            <InputPassword
-              label="Password"
-              value={password}
-              error={passwordError}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-            <InputPassword
-              label="Repeat password"
-              value={repeatPassword}
-              error={repeatPasswordError}
-              onChange={(e) => {
-                setRepeatPassword(e.target.value);
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'end',
+                gap: '0.5rem',
+                marginBottom: 0,
               }}
-              style={{ marginBottom: 0 }}
-              autoComplete="new-password"
-            />
-            {CAPTCHA_ENABLED && (
+            >
+              <SelectOptions
+                options={[
+                  {
+                    id: '+84',
+                    text: 'VN (+84)',
+                  },
+                  {
+                    id: '+1',
+                    text: 'USA (+1)',
+                  },
+                ]}
+                value={phoneCode}
+                onChange={setPhoneCode}
+              />
+              <Input
+                value={reducerState.phoneNumber}
+                error={reducerState.phoneError}
+                onChange={(e) =>
+                  reducerDispatch({
+                    payload: {
+                      phoneNumber: e.target.value,
+                    },
+                  })
+                }
+                style={{ marginBottom: 0, flex: 1 }}
+              />
+            </div>
+            {isCaptchaEnabled && (
               <div style={{ margin: 0 }}>
                 <ReCAPTCHA
                   ref={captchaRef}
@@ -203,30 +284,29 @@ const Signup = ({ open, onClose }) => {
               </div>
             )}
             <p className="modal-signup-terms">
-              {'By creating an account, you agree to our '}
+              {'Bằng cách nhấn vào Đăng ký, bạn đồng ý với '}
               <a target="_blank" href="/terms">
-                Terms
+                Điều khoản
               </a>
-              {' and '}
+              {' và '}
               <a target="_blank" href="/privacy-policy">
-                {' Privacy Policy'}
+                {' Chính sách bảo mật'}
               </a>
               .
             </p>
             <p className="modal-signup-terms is-captcha">
-              This site is protected by reCAPTCHA and the Google{' '}
+              Trang web được bảo vệ bởi reCAPTCHA Google{' '}
               <a href="https://policies.google.com/privacy-policy" target="_blank">
-                Privacy Policy
+                Chính sách
               </a>{' '}
-              and{' '}
+              và{' '}
               <a href="https://policies.google.com/terms" target="_blank">
-                Terms of Service
-              </a>{' '}
-              apply.
+                Điều khoản dịch vụ
+              </a>
             </p>
-            <input type="submit" className="button button-main" value="Signup" />
+            <input type="submit" className="button button-main" value="Đăng ký" />
             <button className="button-link modal-alt-link" onClick={handleOnLogin}>
-              Already have an account? Login
+              Bạn đã có tài khoản? Đăng nhập ngay.
             </button>
           </form>
         </div>

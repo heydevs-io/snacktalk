@@ -26,14 +26,14 @@ const LoginPrompt = () => {
     <Modal open={loginPromptOpen} onClose={handleClose} noOuterClickClose={false}>
       <div className="modal-card is-compact-mobile is-desktop-style" style={{ minWidth: '300px' }}>
         <div className="modal-card-head">
-          <div className="modal-card-title">Login to continue</div>
+          <div className="modal-card-title">Đăng nhập để tiếp tục</div>
           <ButtonClose onClick={handleClose} />
         </div>
         <div className="modal-card-content flex flex-column">
           <button className="button-main" style={{ marginBottom: '7px' }} onClick={handleLogin}>
-            Login
+            Đăng nhập
           </button>
-          <button onClick={handleSignup}>Signup</button>
+          <button onClick={handleSignup}>Đăng ký</button>
         </div>
       </div>
     </Modal>
