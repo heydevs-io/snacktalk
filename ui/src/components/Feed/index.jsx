@@ -15,7 +15,7 @@ const Feed = ({
   onNext,
   onRenderItem,
   onItemHeightChange,
-  emptyItemsText = 'Nothing to show',
+  emptyItemsText = 'Không có gì để hiển thị',
   banner,
   onRemoveFromList = null,
 }) => {

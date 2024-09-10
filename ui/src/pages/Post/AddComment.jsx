@@ -134,7 +134,7 @@ const AddComment = ({
         name=""
         id=""
         rows="3"
-        placeholder="Add a new comment"
+        placeholder="Viết bình luận..."
         value={body}
         onKeyDown={handleKeyDown}
         onClick={handleTextareaClick}
@@ -152,13 +152,13 @@ const AddComment = ({
           </Link>
           <AsUser isMod={isMod} disabled={sendingRequest} onChange={(g) => setUserGroup(g)} />
           <div className="post-comments-new-buttons-buttons">
-            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCancel}>Trở lại</button>
             <button
               className="button-main"
               onClick={handleSubmit}
               disabled={empty || sendingRequest}
             >
-              {editing ? 'Update comment' : 'Add comment'}
+              {editing ? 'Chỉnh sửa' : 'Bình luận'}
             </button>
           </div>
         </div>

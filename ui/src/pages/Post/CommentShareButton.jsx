@@ -15,16 +15,12 @@ export const CommentShareDropdownItems = ({ prefix = '', url }) => {
     dispatch(snackAlert(text, 'comment_link_copied'));
   };
 
-  const to = prefix !== '' ? prefix : 'To ';
+  // const to = prefix !== '' ? prefix : 'To ';
 
   return (
-    <>
-      {/* <div className="dropdown-item">{to}Facebook</div>
-      <div className="dropdown-item">{to}Twitter</div> */}
-      <div className="dropdown-item" onClick={handleCopyURL}>
-        Copy URL
-      </div>
-    </>
+    <div className="dropdown-item" onClick={handleCopyURL}>
+      Sao chép liên kết
+    </div>
   );
 };
 
@@ -35,7 +31,7 @@ CommentShareDropdownItems.propTypes = {
 
 const CommentShareButton = ({ url }) => {
   return (
-    <Dropdown target={<button className="button-text post-comment-button">Share</button>}>
+    <Dropdown target={<button className="button-text post-comment-button">Chia sẻ</button>}>
       <div className="dropdown-list">
         <CommentShareDropdownItems url={url} />
       </div>

@@ -255,7 +255,7 @@ const List = () => {
       <aside className="sidebar-right">
         <div className="card card-sub list-summary">
           <div className="card-head">
-            <div className="card-title">List summary</div>
+            <div className="card-title">Danh sách tổng quan</div>
           </div>
           <div className="card-content">
             <div className="card-list-item">
@@ -264,11 +264,11 @@ const List = () => {
             </div>
             <div className="card-list-item">
               {SVGs.calendar}
-              <div>{`Created on ${dateString1(list.createdAt)}`}</div>
+              <div>{`Đã tạo lúc ${dateString1(list.createdAt)}`}</div>
             </div>
             <div className="card-list-item">
               {SVGs.clock}
-              <div>{`Last updated ${timeAgo(list.lastUpdatedAt)}`}</div>
+              <div>{`Cập nhật lần cuối ${timeAgo(list.lastUpdatedAt)}`}</div>
             </div>
           </div>
         </div>
@@ -285,7 +285,7 @@ const EditListModal = ({ list, open, onClose }) => {
     <Modal open={open} onClose={onClose}>
       <div className="modal-card edit-list-modal is-compact-mobile">
         <div className="modal-card-head">
-          <div className="modal-card-title">Edit list</div>
+          <div className="modal-card-title">Chỉnh sửa danh sách</div>
           <ButtonClose onClick={onClose} />
         </div>
         <EditListForm list={list} onCancel={onClose} onSuccess={onClose} />
@@ -465,7 +465,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
       return;
     }
     if (name === '') {
-      setNameError('Name cannot be empty.');
+      setNameError('Tên không thể để trống');
       return;
     }
     setFormDisabled(true);
@@ -489,9 +489,9 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
       <form className="modal-card-content" onSubmit={handleSubmit}>
         <div className="edit-list-modal-form" onSubmit={handleSubmit}>
           <InputWithCount
-            label="Name"
+            label="Tên"
             maxLength={usernameMaxLength}
-            description="Name will be part of the URL of the list."
+            description="Tên sẽ là một phần của URL trong danh sách."
             error={nameError}
             value={name}
             onChange={handleNameChange}
@@ -506,7 +506,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
             onChange={(e) => setDisplayName(e.target.value)}
           />
           <div className="checkbox is-check-last">
-            <label htmlFor="pub">Public</label>
+            <label htmlFor="pub">Công khai</label>
             <input
               className="switch"
               type="checkbox"
@@ -517,7 +517,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
           </div>
           <div className="input-with-label">
             <div className="input-label-box">
-              <div className="label">Description</div>
+              <div className="label">Mô tả</div>
             </div>
             <textarea
               rows="5"
@@ -530,7 +530,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
       </form>
       <div className="modal-card-actions">
         <button className="button-main" onClick={handleSubmit} disabled={formDisabled}>
-          {list ? 'Save' : 'Create'}
+          {list ? 'Lưu' : 'Tạo mới'}
         </button>
         <button onClick={onCancel}>Cancel</button>
       </div>

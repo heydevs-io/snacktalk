@@ -185,7 +185,7 @@ const Community = () => {
               </ShowMoreBox>
             </div>
             <div className="comm-main-created-at">
-              {`Created on ${dateString1(community.createdAt)}.`}
+              {`Đã tạo lúc ${dateString1(community.createdAt)}.`}
             </div>
           </div>
           <div className="tabs is-m">

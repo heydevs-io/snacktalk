@@ -2,14 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from './Modal';
 import { ButtonClose } from './Button';
-import Input from './Input';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  listsAdded,
-  saveToListModalClosed,
-  snackAlert,
-  snackAlertError,
-} from '../slices/mainSlice';
+import { saveToListModalClosed, snackAlert, snackAlertError } from '../slices/mainSlice';
 import { mfetchjson } from '../helper';
 import { EditListForm } from '../pages/Lists/List';
 
@@ -102,9 +96,9 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
           targetType: toSaveItemType,
         }),
       });
-      const alertText = checked ? `Saved to ${list.name}` : `Removed from ${list.name}`;
+      const alertText = checked ? `Đã lưu vào ${list.name}` : `Đã xóa khỏi ${list.name}`;
       dispatch(
-        snackAlert(alertText, `${checked ? 'add' : 'remove'}_listitem_${list.name}_${toSaveItemId}`)
+        snackAlert(alertText, `${checked ? 'Thêm' : 'Xóa'}_listitem_${list.name}_${toSaveItemId}`)
       );
     } catch (error) {
       setListItemState(list.id, {
@@ -159,7 +153,7 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
           <div className="save-modal-list is-custom-scrollbar is-v2">{renderList()}</div>
         </div>
         <div className="modal-card-actions">
-          <button onClick={() => setPage('new')}>Create new list</button>
+          <button onClick={() => setPage('new')}>Tạo danh sách mới</button>
         </div>
       </>
     );
@@ -181,8 +175,8 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
       >
         <div className="modal-card-head">
           <div className="modal-card-title">
-            {page === 'list' && 'Save to'}
-            {page === 'new' && 'Create list'}
+            {page === 'list' && 'Lưu vào'}
+            {page === 'new' && 'Tạo danh sách'}
           </div>
           <ButtonClose onClick={handleClose} />
         </div>
