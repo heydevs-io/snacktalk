@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +18,6 @@ import { GroupIcon } from './svg/icons/group';
 import { HomeIcon } from './svg/icons/home';
 import CREATE_POST_STYLE from '../assets/imgs/create-post-style.svg';
 import PlusIcon from '../components/svg/icons/plus-icon.jsx';
-import clsx from 'clsx';
 
 const Sidebar = ({ isMobile = false }) => {
   const dispatch = useDispatch();

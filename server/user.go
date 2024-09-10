@@ -1,8 +1,13 @@
 package server
 
 import (
+	"context"
+	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"io"
+	"log"
+	"math/big"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +19,7 @@ import (
 	"github.com/discuitnet/discuit/internal/httperr"
 	"github.com/discuitnet/discuit/internal/httputil"
 	"github.com/discuitnet/discuit/internal/uid"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 )
 
@@ -232,6 +238,151 @@ func (s *Server) login(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
+func (s *Server) requestOTP(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	email := values["email"]
+
+	// check email domain
+	if err := s.checkEmailDomain(r.ctx, email); err != nil {
+		return err
+	}
+
+	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return httperr.NewBadRequest("user_not_found", "User not found")
+	}
+
+	if email == "" {
+		return httperr.NewBadRequest("missing_email", "Missing email")
+	}
+
+	// Generate OTP
+	otp, err := generateOTP(4)
+	if err != nil {
+		return httperr.NewBadRequest("otp_generate_fail", err.Error())
+	}
+
+	// Generate session ID
+	sessionId := uid.New()
+
+	// Save OTP in Redis
+	conn := s.redisPool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + email + ":" + sessionId.String()
+
+	// Set the OTP code with expiration
+	_, err = conn.Do("SETEX", key, s.config.OtpTTL, otp)
+	if err != nil {
+		return httperr.NewBadRequest("otp_save_fail", err.Error())
+	}
+
+	// Run OTP sending in a separate goroutine
+	go func(user *core.User, otp string) {
+		// Detach from the request context
+		backgroundCtx := context.Background()
+
+		// Log the error if sending fails, but don't block the main process
+		if err := s.HandleSendOtp(backgroundCtx, user, otp); err != nil {
+			log.Printf("Failed to send OTP: %v", err)
+		}
+	}(user, otp)
+
+	// Prepare response data
+	responseData := map[string]interface{}{
+		"sessionId": sessionId,
+	}
+
+	// Write JSON response
+	if err := w.writeJSON(responseData); err != nil {
+		return httperr.NewBadRequest("response_write_fail", err.Error())
+	}
+
+	return nil
+}
+
+func (s *Server) verifyOTP(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	email := values["email"]
+	otp := values["otp"]
+	sessionId := values["sessionId"]
+
+	if otp == "" || sessionId == "" {
+		return httperr.NewBadRequest("missing_data", "Missing data")
+	}
+
+	conn := s.redisPool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + email + ":" + sessionId
+
+	// Retrieve the OTP code from Redis
+	storedOTP, err := redis.String(conn.Do("GET", key))
+	if err == redis.ErrNil {
+		// OTP does not exist or has expired
+		return httperr.NewBadRequest("invalid_or_expired_otp", "Invalid or expired OTP")
+	}
+	if err != nil {
+		return httperr.NewBadRequest("otp_retrieve_fail", err.Error())
+	}
+
+	// Compare stored OTP with provided OTP
+	if storedOTP != otp {
+		return httperr.NewBadRequest("invalid_otp", "Invalid OTP")
+	}
+
+	// OTP is valid, proceed with your login or next step
+	// get user info
+	user, err := core.GetUserByEmail(r.ctx, s.db, email, nil)
+
+	if err != nil {
+		return httperr.NewBadRequest("user_not_found", "User not found")
+	}
+
+	// Try logging in user.
+	s.loginUser(user, r.ses, w, r.req)
+
+	// Delete OTP key from Redis
+	_, err = conn.Do("DEL", key)
+	if err != nil {
+		return httperr.NewBadRequest("otp_delete_fail", err.Error())
+	}
+
+	// Prepare success response
+	responseData := map[string]interface{}{
+		"message": "OTP verified successfully",
+	}
+
+	// Write JSON response
+	if err := w.writeJSON(responseData); err != nil {
+		return httperr.NewBadRequest("response_write_fail", err.Error())
+	}
+
+	return nil
+}
+
 // /api/_signup [POST]
 func (s *Server) signup(w *responseWriter, r *request) error {
 	if r.loggedIn {
@@ -246,14 +397,17 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 	username := values["username"]
 	email := values["email"]
 	password := values["password"]
+	phoneCode := values["phoneCode"]
+	phoneNumber := values["phoneNumber"]
 	captchaToken := values["captchaToken"]
+	fullName := ""
 
 	// Verify captcha.
 	if s.config.CaptchaSecret != "" {
 		if ok, err := hcaptcha.VerifyReCaptcha(s.config.CaptchaSecret, captchaToken); err != nil {
-			return httperr.NewForbidden("captcha_verify_fail_1", "Captha verification failed.")
+			return httperr.NewForbidden("captcha_verify_fail_1", "Captcha verification failed.")
 		} else if !ok {
-			return httperr.NewForbidden("captcha_verify_fail_2", "Captha verification failed.")
+			return httperr.NewForbidden("captcha_verify_fail_2", "Captcha verification failed.")
 		}
 	}
 
@@ -265,7 +419,7 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 		return err
 	}
 
-	user, err := core.RegisterUser(r.ctx, s.db, username, email, password)
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber, fullName)
 	if err != nil {
 		return err
 	}
@@ -275,6 +429,78 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 
 	w.WriteHeader(http.StatusCreated)
 	return w.writeJSON(user)
+}
+
+// /api/_signup_ver2 [POST]
+// sign up without password, use OTP to login
+func (s *Server) signupVer2(w *responseWriter, r *request) error {
+	if r.loggedIn {
+		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	username := values["username"]
+	fullName := values["fullName"]
+	email := values["email"]
+	phoneCode := values["phoneCode"]
+	phoneNumber := values["phoneNumber"]
+	password := randomPassword(9)
+
+	err = s.checkEmailDomain(r.ctx, email)
+	if err != nil {
+		return err
+	}
+
+	// check if email had ben registered
+	if user, _ := core.GetUserByEmail(r.ctx, s.db, email, nil); user != nil {
+		return httperr.NewBadRequest("email_already_registered", "Email already registered")
+	}
+
+	ip := httputil.GetIP(r.req)
+	if err := s.rateLimit(r, "signup_1_"+ip, time.Minute, 2); err != nil {
+		return err
+	}
+	if err := s.rateLimit(r, "signup_2_"+ip, time.Hour*6, 10); err != nil {
+		return err
+	}
+
+	user, err := core.RegisterUser(r.ctx, s.db, username, email, password, phoneCode, phoneNumber, fullName)
+	if err != nil {
+		return err
+	}
+
+	// Identify the user in Novu
+	err = s.IdentifyUser(r.ctx, user)
+	if err != nil {
+		return err
+	}
+
+	// Try logging in user.
+	// s.loginUser(user, r.ses, w, r.req)
+
+	w.WriteHeader(http.StatusCreated)
+	return w.writeJSON(user)
+}
+
+func (s *Server) checkEmailDomain(ctx context.Context, email string) error {
+	// Extraxt the domain from the email
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return httperr.NewBadRequest("invalid_email", "Invalid email format")
+	}
+
+	domain := parts[1]
+
+	// Check if the domain or any of its parent domains is blacklisted
+	if err := core.CheckBlackDomain(ctx, s.db, domain); err != nil {
+		return httperr.NewForbidden("invalid_domain", err.Error())
+	}
+
+	return nil
 }
 
 // /api/_user [GET]
@@ -293,6 +519,30 @@ func (s *Server) getLoggedInUser(w *responseWriter, r *request) error {
 	}
 
 	return w.writeJSON(user)
+}
+
+func (s *Server) logout(w *responseWriter, r *request) error {
+	// Check if the user is logged in
+	if !r.loggedIn {
+		return httperr.NewBadRequest("not_logged_in", "User is not logged in.")
+	}
+
+	// Get the current user
+	user, err := core.GetUser(r.ctx, s.db, *r.viewer, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Perform the logout operation
+	if err = s.logoutUser(user, r.ses, w, r.req); err != nil {
+		return err
+	}
+
+	// Respond with a success message
+	responseData := map[string]interface{}{
+		"message": "Successfully logged out.",
+	}
+	return w.writeJSON(responseData)
 }
 
 // /api/notifications [POST]
@@ -610,4 +860,48 @@ func (s *Server) addBadge(w *responseWriter, r *request) error {
 	}
 
 	return w.writeJSON(user.Badges)
+}
+
+const (
+	lowerChars = "abcdefghijklmnopqrstuvwxyz"
+	upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	digits     = "0123456789"
+	specials   = "!@#$%&*_"
+)
+
+func randomPassword(length int) string {
+	allChars := lowerChars + upperChars + digits + specials
+	password := make([]string, length)
+
+	for i := 0; i < length; i++ {
+		char, err := randChar(allChars)
+		if err != nil {
+			return "R@ndom123"
+		}
+		password[i] = char
+	}
+
+	return strings.Join(password, "")
+}
+
+func randChar(charset string) (string, error) {
+	max := big.NewInt(int64(len(charset)))
+	randomIndex, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return "", err
+	}
+	return string(charset[randomIndex.Int64()]), nil
+}
+
+// generateOTP generates a 6-digit OTP.
+func generateOTP(otpLength int) (string, error) {
+	otp := ""
+	for i := 0; i < otpLength; i++ {
+		digit, err := rand.Int(rand.Reader, big.NewInt(10))
+		if err != nil {
+			return "", fmt.Errorf("Fail to generate OTP")
+		}
+		otp += digit.String()
+	}
+	return otp, nil
 }

@@ -65,7 +65,7 @@ type RedisStore struct {
 }
 
 // NewRedisStore returns a session store that uses Redis for storage. Redis
-// runs on tcp port 6379 by default.
+// runs on tcp port 6381 by default.
 func NewRedisStore(network, address, cookieName string) (*RedisStore, error) {
 	store := &RedisStore{CookieName: cookieName, IDLength: defaultSessionIDLength}
 	store.pool = &redis.Pool{
@@ -178,4 +178,39 @@ func generateID(length int) string {
 	}
 
 	return id
+}
+
+// SaveOTP saves the OTP code and session ID into Redis with an expiration time.
+func (rs *RedisStore) SaveOTP(sessionID, otpCode string, ttl time.Duration) error {
+	conn := rs.pool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + sessionID
+
+	// Set the OTP code with expiration
+	_, err := conn.Do("SETEX", key, int(ttl.Seconds()), otpCode)
+	return err
+}
+
+// ValidateOTP retrieves and validates the OTP code for a given session ID.
+func (rs *RedisStore) ValidateOTP(sessionID, otpCode string) (bool, error) {
+	conn := rs.pool.Get()
+	defer conn.Close()
+
+	// Create the key for OTP storage
+	key := "otp:" + sessionID
+
+	// Retrieve the OTP code from Redis
+	storedOTP, err := redis.String(conn.Do("GET", key))
+	if err == redis.ErrNil {
+		// OTP does not exist or has expired
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	// Compare stored OTP with provided OTP
+	return storedOTP == otpCode, nil
 }

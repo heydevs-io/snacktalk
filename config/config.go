@@ -73,6 +73,13 @@ type Config struct {
 	DiscordURL     string `yaml:"discordURL"`
 	GithubURL      string `yaml:"githubURL"`
 	SubstackURL    string `yaml:"substackURL"`
+
+	// redis otp ttl
+	OtpTTL int `yaml:"otpTTL"`
+
+	// novu
+	NovuApiKey string `yaml:"novuApiKey"`
+	NovuApiUrl string `yaml:"novuApiUrl"`
 }
 
 // Parse parses the yaml file at path and returns a Config.
@@ -82,7 +89,7 @@ func Parse(path string) (*Config, error) {
 		Addr:               ":8080",
 		DBUser:             "discuit",
 		SessionCookieName:  "SID",
-		RedisAddress:       ":6379",
+		RedisAddress:       ":6381",
 		PaginationLimit:    10,
 		PaginationLimitMax: 50,
 		DefaultFeedSort:    core.FeedSortHot,

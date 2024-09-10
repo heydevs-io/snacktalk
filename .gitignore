@@ -10,3 +10,4 @@ node_modules
 /discuit
 /images
 .secrets
+.air.toml

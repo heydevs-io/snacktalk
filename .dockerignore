@@ -1,7 +1,7 @@
 node_modules
 .vscode
 /ui/dist/
-/config.yaml
+# /config.yaml
 /ui-config.yaml
 /.env
 /cookies

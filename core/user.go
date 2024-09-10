@@ -100,8 +100,10 @@ type User struct {
 	Username          string `json:"username"`
 	UsernameLowerCase string `json:"-"`
 
-	EmailPublic *string `json:"email"`
-
+	FullName         msql.NullString `json:"fullName"`
+	EmailPublic      *string         `json:"email"`
+	PhoneCode        msql.NullString `json:"phoneCode"`
+	PhoneNumber      msql.NullString `json:"phoneNumber"`
 	Email            msql.NullString `json:"-"`
 	EmailConfirmedAt msql.NullTime   `json:"emailConfirmedAt"`
 	Password         string          `json:"-"`
@@ -235,6 +237,9 @@ func buildSelectUserQuery(where string) string {
 		"users.remember_feed_sort",
 		"users.embeds_off",
 		"users.hide_user_profile_pictures",
+		"users.phone_code",
+		"users.phone_number",
+		"users.full_name",
 	}
 	cols = append(cols, images.ImageColumns("pro_pic")...)
 	joins := []string{
@@ -298,6 +303,7 @@ func GetUserByEmail(ctx context.Context, db *sql.DB, email string, viewer *uid.I
 	if err != nil {
 		return nil, err
 	}
+
 	return users[0], err
 }
 
@@ -334,6 +340,9 @@ func scanUsers(ctx context.Context, db *sql.DB, rows *sql.Rows, viewer *uid.ID) 
 			&u.RememberFeedSort,
 			&u.EmbedsOff,
 			&u.HideUserProfilePictures,
+			&u.PhoneCode,
+			&u.PhoneNumber,
+			&u.FullName,
 		}
 
 		proPic := &images.Image{}
@@ -414,7 +423,7 @@ func scanUsers(ctx context.Context, db *sql.DB, rows *sql.Rows, viewer *uid.ID) 
 }
 
 // RegisterUser creates a new user.
-func RegisterUser(ctx context.Context, db *sql.DB, username, email, password string) (*User, error) {
+func RegisterUser(ctx context.Context, db *sql.DB, username, email, password string, phoneCode string, phoneNumber string, fullName string) (*User, error) {
 	// Check for duplicates.
 	if exists, _, err := usernameExists(ctx, db, username); err != nil {
 		return nil, err
@@ -431,12 +440,17 @@ func RegisterUser(ctx context.Context, db *sql.DB, username, email, password str
 		return nil, httperr.NewBadRequest("invalid-username", fmt.Sprintf("Username %v.", err))
 	}
 
+	// Validate phoneCode and phoneNumber relationship
+	if (phoneCode != "" && phoneNumber == "") || (phoneCode == "" && phoneNumber != "") {
+		return nil, httperr.NewBadRequest("invalid-phone", "If phoneCode is provided, phoneNumber must also be provided, and vice versa.")
+	}
+
 	hash, err := HashPassword([]byte(password))
 	if err != nil {
 		return nil, err
 	}
 
-	// Note: Thet email address is not checked to be a valid email address. Any
+	// Note: The email address is not checked to be a valid email address. Any
 	// string can be stored as an email address currently.
 	nullEmail := msql.NullString{}
 	if email != "" {
@@ -444,13 +458,34 @@ func RegisterUser(ctx context.Context, db *sql.DB, username, email, password str
 		nullEmail.String = email
 	}
 
+	nullPhoneCode := msql.NullString{}
+	if phoneCode != "" {
+		nullPhoneCode.Valid = true
+		nullPhoneCode.String = phoneCode
+	}
+
+	nullPhoneNumber := msql.NullString{}
+	if phoneNumber != "" {
+		nullPhoneNumber.Valid = true
+		nullPhoneNumber.String = phoneNumber
+	}
+
+	nullFullName := msql.NullString{}
+	if fullName != "" {
+		nullFullName.Valid = true
+		nullFullName.String = fullName
+	}
+
 	id := uid.New()
 	query, args := msql.BuildInsertQuery("users", []msql.ColumnValue{
 		{Name: "id", Value: id},
 		{Name: "username", Value: username},
 		{Name: "username_lc", Value: strings.ToLower(username)},
+		{Name: "full_name", Value: nullFullName},
 		{Name: "email", Value: nullEmail},
 		{Name: "password", Value: hash},
+		{Name: "phone_code", Value: nullPhoneCode},
+		{Name: "phone_number", Value: nullPhoneNumber},
 	})
 	_, err = db.ExecContext(ctx, query, args...)
 	if err != nil {
@@ -1236,7 +1271,7 @@ func CreateGhostUser(db *sql.DB) (bool, error) {
 	if err := db.QueryRow("SELECT username_lc FROM users WHERE username_lc = ?", "ghost").Scan(&username); err != nil {
 		if err == sql.ErrNoRows {
 			// Ghost user not found; create one.
-			_, createErr := RegisterUser(context.Background(), db, "ghost", "", utils.GenerateStringID(48))
+			_, createErr := RegisterUser(context.Background(), db, "ghost", "", utils.GenerateStringID(48), "", "", "")
 			return createErr == nil, createErr
 		}
 		return false, err

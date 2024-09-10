@@ -103,8 +103,12 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 
 	// API routes.
 	r.Handle("/api/_initial", s.withHandler(s.initial)).Methods("GET")
+	r.Handle("/api/_request_otp", s.withHandler(s.requestOTP)).Methods("POST")
+	r.Handle("/api/_verify_otp", s.withHandler(s.verifyOTP)).Methods("POST")
 	r.Handle("/api/_login", s.withHandler(s.login)).Methods("POST")
 	r.Handle("/api/_signup", s.withHandler(s.signup)).Methods("POST")
+	r.Handle("/api/_signup_v2", s.withHandler(s.signupVer2)).Methods("POST")
+	r.Handle("/api/_logout", s.withHandler(s.logout)).Methods("POST")
 	r.Handle("/api/_user", s.withHandler(s.getLoggedInUser)).Methods("GET")
 
 	r.Handle("/api/users/{username}", s.withHandler(s.getUser)).Methods("GET")
@@ -186,6 +190,10 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 
 	r.Handle("/api/analytics", s.withHandler(s.handleAnalytics)).Methods("POST")
 
+	r.Handle("/api/_blacklists", s.withHandler(s.getBlackListDomains)).Methods("GET")
+	r.Handle("/api/_blacklists/one", s.withHandler(s.createBlackDomain)).Methods("POST")
+	r.Handle("/api/_blacklists", s.withHandler(s.createBlackDomains)).Methods("POST")
+
 	r.NotFoundHandler = http.HandlerFunc(s.apiNotFoundHandler)
 	r.MethodNotAllowedHandler = http.HandlerFunc(s.apiMethodNotAllowedHandler)
 
@@ -193,7 +201,7 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	s.staticRouter.PathPrefix("/images/").Handler(&images.Server{
 		SkipHashCheck: conf.IsDevelopment,
 		DB:            db,
-		EnableCORS:    true,
+		EnableCORS:    false,
 	})
 
 	if conf.UIProxy != "" {
@@ -348,9 +356,11 @@ func (s *Server) setCsrfCookie(ses *sessions.Session, w http.ResponseWriter, r *
 	if setCookie {
 		token := utils.NewHMAC(ses.ID, s.config.HMACSecret)
 		http.SetCookie(w, &http.Cookie{
-			Name:  "csrftoken",
-			Value: token,
-			Path:  "/",
+			Name:     "csrftoken",
+			Value:    token,
+			Path:     "/",
+			Secure:   true,
+			HttpOnly: true,
 		})
 		w.Header().Add("Csrf-Token", token)
 	}
@@ -358,6 +368,7 @@ func (s *Server) setCsrfCookie(ses *sessions.Session, w http.ResponseWriter, r *
 
 func (s *Server) setInitialCookies(w http.ResponseWriter, r *http.Request, ses *sessions.Session) {
 	if !ses.CookieSet {
+		fmt.Println("ses.CookieSet", ses.CookieSet)
 		ses.Save(w, r)
 	}
 	s.setCsrfCookie(ses, w, r)
