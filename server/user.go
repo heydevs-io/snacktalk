@@ -480,7 +480,7 @@ func (s *Server) signupVer2(w *responseWriter, r *request) error {
 	}
 
 	// Try logging in user.
-	// s.loginUser(user, r.ses, w, r.req)
+	s.loginUser(user, r.ses, w, r.req)
 
 	w.WriteHeader(http.StatusCreated)
 	return w.writeJSON(user)
