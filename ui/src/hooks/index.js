@@ -340,7 +340,7 @@ export function useMuteUser({ userId, username }) {
   return {
     isMuted,
     toggleMute,
-    displayText: (isMuted ? 'Unmute' : 'Mute') + ` @${username}`,
+    displayText: (isMuted ? 'Bỏ tắt tiếng' : 'Tắt tiếng') + ` @${username}`,
   };
 }
 
@@ -354,7 +354,7 @@ export function useMuteCommunity({ communityId, communityName }) {
   return {
     isMuted,
     toggleMute,
-    displayText: (isMuted ? 'Unmute' : 'Mute') + ` /${communityName}`,
+    displayText: (isMuted ? 'Bỏ tắt tiếng' : 'Tắt tiếng') + ` /${communityName}`,
   };
 }
 

@@ -28,7 +28,6 @@ const initialState = {
   fullNameError: null,
   phoneCode: '+84',
   phoneNumber: '',
-  phoneError: null,
 };
 
 const reducer = (state, action) => ({
@@ -77,14 +76,6 @@ const Signup = ({ open, onClose }) => {
     });
   }, [reducerState.email]);
 
-  useEffect(() => {
-    reducerDispatch({
-      payload: {
-        phoneError: null,
-      },
-    });
-  }, [reducerState.phoneNumber]);
-
   const isCaptchaEnabled = !!CONFIG.captchaSiteKey;
   const captchaRef = useRef();
   const handleCaptchaVerify = (token) => {
@@ -113,7 +104,7 @@ const Signup = ({ open, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { fullName, email, phoneNumber } = reducerState;
+    const { fullName, email } = reducerState;
     let errFound = false;
     if (!username) {
       errFound = true;
@@ -132,7 +123,7 @@ const Signup = ({ open, onClose }) => {
           fullNameError: 'Họ và tên không được để trống',
         },
       });
-    } else if (fullName.length < 10) {
+    } else if (fullName.length < 2) {
       errFound = true;
       reducerDispatch({
         payload: {
@@ -157,20 +148,14 @@ const Signup = ({ open, onClose }) => {
       });
     }
 
-    if (!phoneNumber) {
-      errFound = true;
-      reducerDispatch({
-        payload: {
-          phoneError: 'Số điện thoại không được để trống',
-        },
-      });
-    }
-
     if (errFound) {
       return;
     }
     if (!isCaptchaEnabled) {
-      signInUser({ username, ...reducerState });
+      const { fullName, email, phoneNumber } = reducerState;
+      signInUser(
+        phoneNumber !== '' ? { username, ...reducerState } : { username, fullName, email }
+      );
       return;
     }
     if (!captchaRef.current) {
@@ -199,6 +184,7 @@ const Signup = ({ open, onClose }) => {
           </div>
           <form className="modal-card-content" onSubmit={handleSubmit}>
             <InputWithCount
+              isRequired
               label="Username"
               maxLength={usernameMaxLength}
               description="Tên người dùng của bạn. Bạn không thể thay đổi sau khi tạo."
@@ -212,6 +198,7 @@ const Signup = ({ open, onClose }) => {
             />
             <Input
               label="Họ và tên"
+              isRequired
               description="Tên đầy đủ của bạn."
               value={reducerState.fullName}
               error={reducerState.fullNameError}
@@ -226,6 +213,7 @@ const Signup = ({ open, onClose }) => {
             <Input
               type="email"
               label="Email"
+              isRequired
               description="Địa chỉ email của bạn."
               value={reducerState.email}
               error={reducerState.emailError}
@@ -237,40 +225,44 @@ const Signup = ({ open, onClose }) => {
                 })
               }
             />
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'end',
-                gap: '0.5rem',
-                marginBottom: 0,
-              }}
-            >
-              <SelectOptions
-                options={[
-                  {
-                    id: '+84',
-                    text: 'VN (+84)',
-                  },
-                  {
-                    id: '+1',
-                    text: 'USA (+1)',
-                  },
-                ]}
-                value={phoneCode}
-                onChange={setPhoneCode}
-              />
-              <Input
-                value={reducerState.phoneNumber}
-                error={reducerState.phoneError}
-                onChange={(e) =>
-                  reducerDispatch({
-                    payload: {
-                      phoneNumber: e.target.value,
+            <div style={{ marginTop: 0 }}>
+              <div className="label" style={{ marginBlock: '0.5rem' }}>
+                Số điện thoại
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'end',
+                  gap: '0.5rem',
+                  marginBottom: 0,
+                }}
+              >
+                <SelectOptions
+                  options={[
+                    {
+                      id: '+84',
+                      text: 'VN (+84)',
                     },
-                  })
-                }
-                style={{ marginBottom: 0, flex: 1 }}
-              />
+                    {
+                      id: '+1',
+                      text: 'USA (+1)',
+                    },
+                  ]}
+                  value={phoneCode}
+                  onChange={setPhoneCode}
+                />
+                <Input
+                  value={reducerState.phoneNumber}
+                  onChange={(e) =>
+                    reducerDispatch({
+                      payload: {
+                        phoneNumber: e.target.value,
+                      },
+                    })
+                  }
+                  style={{ marginBottom: 0, flex: 1 }}
+                />
+              </div>
             </div>
             {isCaptchaEnabled && (
               <div style={{ margin: 0 }}>
@@ -294,7 +286,7 @@ const Signup = ({ open, onClose }) => {
               </a>
               .
             </p>
-            <p className="modal-signup-terms is-captcha">
+            {/* <p className="modal-signup-terms is-captcha">
               Trang web được bảo vệ bởi reCAPTCHA Google{' '}
               <a href="https://policies.google.com/privacy-policy" target="_blank">
                 Chính sách
@@ -303,7 +295,7 @@ const Signup = ({ open, onClose }) => {
               <a href="https://policies.google.com/terms" target="_blank">
                 Điều khoản dịch vụ
               </a>
-            </p>
+            </p> */}
             <input type="submit" className="button button-main" value="Đăng ký" />
             <button className="button-link modal-alt-link" onClick={handleOnLogin}>
               Bạn đã có tài khoản? Đăng nhập ngay.

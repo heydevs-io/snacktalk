@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
-import WelcomeBanner from '../views/WelcomeBanner';
 import MiniFooter from '../components/MiniFooter';
 import CommunityProPic from '../components/CommunityProPic';
 import PageLoading from '../components/PageLoading';
@@ -15,7 +14,6 @@ import {
 } from '../slices/mainSlice';
 import ShowMoreBox from '../components/ShowMoreBox';
 import MarkdownBody from '../components/MarkdownBody';
-import Link from '../components/Link';
 import LoginForm from '../views/LoginForm';
 import Modal from '../components/Modal';
 import { ButtonClose } from '../components/Button';
@@ -23,16 +21,15 @@ import { InputWithCount, useInputMaxLength } from '../components/Input';
 import { communityNameMaxLength } from '../config';
 import { useInputUsername } from '../hooks';
 import JoinButton from './Community/JoinButton';
-import { useHistory, useLocation } from 'react-router-dom';
-import Feed from '../components/Feed';
+import { useHistory } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 
 const prepareText = (isMobile = false) => {
-  const x = isMobile ? 'by filling out the form below' : 'by clicking on the button below';
-  return `Communities are currently available only on a per request
-    basis. You can request one ${x}, and if you seem
-    reasonable and trustworthy, the requested community will be created and you will
-    be added as a moderator of that community.`;
+  const x = isMobile ? 'bằng cách điền vào biểu mẫu dưới đây' : 'bằng cách nhấp vào nút bên dưới';
+  return `Hiện tại, cộng đồng chỉ khả dụng theo yêu cầu. 
+    Bạn có thể yêu cầu một ${x} và nếu bạn có vẻ
+    hợp lý và đáng tin cậy, cộng đồng được yêu cầu sẽ được tạo và bạn sẽ
+    được thêm vào làm người điều hành của cộng đồng đó.`;
 };
 
 const AllCommunities = () => {
@@ -72,9 +69,9 @@ const AllCommunities = () => {
       <Sidebar />
       <main>
         <div className="page-comms-header card card-padding">
-          <h1>All communities</h1>
+          <h1>Danh sách cộng đồng</h1>
           <RequestCommunityButton className="button-main is-m" isMobile>
-            New
+            Mới
           </RequestCommunityButton>
         </div>
         <div className="comms-list">
@@ -149,10 +146,12 @@ export default AllCommunities;
 const CommunityCreationCard = () => {
   return (
     <div className="card card-sub card-padding home-welcome">
-      <div className="home-welcome-join">New communities</div>
+      <div className="home-welcome-join">Cộng đồng mới</div>
       <div className="home-welcome-subtext">{prepareText()}</div>
       <div className="home-welcome-buttons">
-        <RequestCommunityButton className="button-main">Request a community</RequestCommunityButton>
+        <RequestCommunityButton className="button-main">
+          Yêu cầu tạo cộng đồng
+        </RequestCommunityButton>
       </div>
     </div>
   );
@@ -286,7 +285,7 @@ const ListItem = ({ community }) => {
           </a>
           <JoinButton className="comms-list-item-join" community={community} />
         </div>
-        <div className="comms-list-item-count">{`${community.noMembers} members`}</div>
+        <div className="comms-list-item-count">{`${community.noMembers} thành viên`}</div>
         <div className="comms-list-item-about">
           <ShowMoreBox maxHeight="120px">
             <MarkdownBody>{community.about}</MarkdownBody>

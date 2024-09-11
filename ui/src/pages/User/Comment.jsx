@@ -5,7 +5,6 @@ import TimeAgo from '../../components/TimeAgo';
 import { kRound, stringCount } from '../../helper';
 import MarkdownBody from '../../components/MarkdownBody';
 import ShowMoreBox from '../../components/ShowMoreBox';
-import CommunityLink from '../../components/PostCard/CommunityLink';
 
 const Comment = ({ comment, onRemoveFromList = null }) => {
   return (
@@ -47,7 +46,7 @@ const Comment = ({ comment, onRemoveFromList = null }) => {
         <div className="comment-remove">
           {onRemoveFromList && (
             <button className="button-clear" onClick={() => onRemoveFromList(comment.id)}>
-              Remove
+              Gỡ bỏ
             </button>
           )}
         </div>

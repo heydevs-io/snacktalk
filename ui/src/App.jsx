@@ -263,7 +263,7 @@ const App = () => {
       >
         <div className="modal-card modal-form modal-login">
           <div className="modal-card-head">
-            <div className="modal-card-title">Login</div>
+            <div className="modal-card-title">Đăng nhập tài khoản</div>
             <ButtonClose onClick={() => dispatch(loginModalOpened(false))} />
           </div>
           <LoginForm isModal />

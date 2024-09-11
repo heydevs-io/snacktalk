@@ -2,7 +2,7 @@ import React, { forwardRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 const Input = forwardRef(function Input(
-  { className, style, type = 'text', label, description, error, ...rest },
+  { className, isRequired, style, type = 'text', label, description, error, ...rest },
   ref
 ) {
   if (className) className = ` ${className}`;
@@ -14,7 +14,20 @@ const Input = forwardRef(function Input(
       >
         {(label || description || error) && (
           <div className="input-label-box">
-            {label && <div className="label">{label}</div>}
+            {label && (
+              <div className="label">
+                {label}{' '}
+                {isRequired && (
+                  <span
+                    style={{
+                      color: 'red',
+                    }}
+                  >
+                    *
+                  </span>
+                )}
+              </div>
+            )}
             {description && <div className="input-desc">{description}</div>}
             {error && (
               <div className="form-error" style={{ textAlign: 'left' }}>
@@ -38,6 +51,7 @@ Input.propTypes = {
   label: PropTypes.string,
   description: PropTypes.string,
   error: PropTypes.string,
+  isRequired: PropTypes.bool,
 };
 
 export default Input;
@@ -45,6 +59,7 @@ export default Input;
 export const InputWithCount = ({
   className,
   style,
+  isRequired,
   textarea = false,
   type = 'text',
   label,
@@ -65,7 +80,20 @@ export const InputWithCount = ({
     >
       {(label || description || error) && (
         <div className="input-label-box">
-          {label && <div className="label">{label}</div>}
+          {label && (
+            <div className="label">
+              {label}{' '}
+              {isRequired && (
+                <span
+                  style={{
+                    color: 'red',
+                  }}
+                >
+                  *
+                </span>
+              )}
+            </div>
+          )}
           {description && <div className="input-desc">{description}</div>}
           {error && (
             <div className="form-error" style={{ textAlign: 'left' }}>
@@ -95,6 +123,7 @@ InputWithCount.propTypes = {
   error: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  isRequired: PropTypes.bool,
 };
 
 export function useInputMaxLength(maxLength, initial = '') {

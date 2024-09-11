@@ -64,8 +64,20 @@ const LoginForm = ({ isModal = false }) => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    if (email === '') {
+      setLoginError('Email không được để trống.');
+      return;
+    } else if (!validEmail(email)) {
+      setLoginError('Email không hợp lệ.');
+      return;
+    }
+
     if (otp === '') {
-      setLoginError('OTP không được để trống.');
+      if (!otpSent) {
+        setLoginError('Vui lòng gửi mã OTP.');
+        return;
+      }
+      setLoginError('Vui lòng nhập mã OTP.');
       return;
     } else if (otp.length < 4) {
       setLoginError('OTP không hợp lệ.');
@@ -166,7 +178,7 @@ const LoginForm = ({ isModal = false }) => {
           />
         </div>
       )}
-      <button className="button-link modal-alt-link" onClick={handleOnSignup}>
+      <button type="button" className="button-link modal-alt-link" onClick={handleOnSignup}>
         Bạn đã có tài khoản? Đăng ký ngay
       </button>
     </form>

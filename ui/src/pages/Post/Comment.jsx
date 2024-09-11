@@ -453,12 +453,12 @@ const Comment = ({
       ref={div}
     >
       <ModalConfirm
-        title="Delete comment?"
+        title="Xóa bình luận?"
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
         onConfirm={handleOnDelete}
       >
-        Are you sure you want to delete the comment?
+        Bạn có chắc chắn muốn xóa bình luận này?
       </ModalConfirm>
       <div className="post-comment-left">
         <div className="post-comment-collapse" onClick={handleLineClick}>
@@ -594,7 +594,7 @@ const Comment = ({
               title={comment.depth === MaxCommentDepth ? 'Thread too deep.' : ''}
               disabled={!canComment || comment.depth === MaxCommentDepth}
             >
-              Reply
+              Trả lời
             </button>
           )}
           {!deleted && isMobile && (
@@ -615,21 +615,21 @@ const Comment = ({
                   {showEditDelete && (
                     <>
                       <div className="dropdown-item" onClick={handleOnEdit}>
-                        Edit
+                        Chỉnh sửa
                       </div>
                       <div className="dropdown-item" onClick={() => setConfirmDeleteOpen(true)}>
-                        Delete
+                        Xóa
                       </div>
                     </>
                   )}
                   {showReport && (
                     <div className="dropdown-item" onClick={() => setReportModalOpen(true)}>
-                      Report
+                      Báo cáo
                     </div>
                   )}
                   {loggedIn && (
                     <div className="dropdown-item" onClick={handleSave}>
-                      Save to list
+                      Lưu
                     </div>
                   )}
                   {isAdmin && (
@@ -654,10 +654,10 @@ const Comment = ({
               {showEditDelete && (
                 <>
                   <button className="button-text" onClick={handleOnEdit}>
-                    Edit
+                    Chỉnh sửa
                   </button>
                   <button className="button-text" onClick={() => setConfirmDeleteOpen(true)}>
-                    Delete
+                    Xóa
                   </button>
                 </>
               )}
@@ -666,7 +666,7 @@ const Comment = ({
               )}
               {loggedIn && (
                 <button className="button-text" onClick={handleSave}>
-                  Save
+                  Lưu
                 </button>
               )}
               {isAdmin && (
@@ -731,7 +731,7 @@ const Comment = ({
             onClick={handleLoadReplies}
             disabled={isRepliesLoading}
           >
-            {isRepliesLoading ? 'loading...' : `${noMoreComments} more replies`}
+            {isRepliesLoading ? 'đang tải...' : `${noMoreComments} phản hồi khác`}
           </button>
         )}
       </div>
